@@ -1,0 +1,279 @@
+---
+title: "Practical 12"
+author: "Yash Jaiswal"
+date: "2026-11-25"
+output: html_document
+---
+
+
+# Aim
+
+To develop and compare two Continuous Sampling Plan-1 (CSP-1) plans for a manufacturing process when the specified Average Outgoing Quality Limit (AOQL) is 1.90%; to calculate and compare their Average Fraction Inspected (AFI) and Operating Characteristic (OC) values; and to select the preferred plan when the incoming fraction defective is p = 0.0375. For the updated Plan 1, the sampling fraction is f = 0.25 and the clearance number is i = 31.
+
+# Problem Statement
+
+Suppose CSP-1 is used for a manufacturing process for which an AOQL of 1.90% is desired. Develop and compare two CSP-1 plans.
+
+- Plan 1: Sampling fraction f = 0.25 and clearance number i = 31.
+- Plan 2: Sampling fraction f = 0.10 and clearance number i = 57.
+
+Compare the plans in terms of their Average Outgoing Quality (AOQ), Average Fraction Inspected (AFI) and Operating Characteristic (OC) curves. Decide which plan is preferable when the incoming fraction defective is p = 0.0375.
+
+# Theory and Formulae
+
+Continuous Sampling Plan-1 (CSP-1) is a sampling inspection procedure used in continuous production processes. In this plan, all units are inspected initially. After obtaining i consecutive conforming (defect-free) units, inspection is reduced to sampling inspection, where only a fraction f of the units is inspected.
+
+If a defective unit is detected during sampling inspection, 100% inspection is resumed. This procedure helps maintain outgoing quality while reducing inspection effort.
+
+Let:
+
+- p = Incoming fraction defective.
+- q = 1 - p = Fraction of non-defective units.
+- f = Sampling fraction.
+- i = Clearance number.
+
+**Average Outgoing Quality (AOQ)**
+
+AOQ represents the expected proportion of defective units leaving the inspection process.
+
+$$
+AOQ(p)=\frac{p(1-f)q^i}{f+(1-f)q^i}
+$$
+
+**Average Outgoing Quality Limit (AOQL)**
+
+AOQL is the maximum value of AOQ over the range of incoming quality levels.
+
+$$
+AOQL=\max AOQ(p)
+$$
+
+**Average Fraction Inspected (AFI)**
+
+AFI represents the average proportion of units inspected under the CSP-1 procedure.
+
+$$
+AFI(p)=\frac{f}{f+(1-f)q^i}
+$$
+
+**Operating Characteristic (OC)**
+
+The OC function represents the probability of acceptance under the sampling plan.
+
+$$
+P_a(p)=\frac{q^i}{f+(1-f)q^i}
+$$
+
+The required AOQL is 0.019 (1.90%). The two plans are compared over the incoming fraction defective range from 0.001 to 0.150 and specifically at p = 0.0375.
+
+# R Code
+
+```{r}
+# PRACTICAL 12: CONTINUOUS SAMPLING PLAN-1 (CSP-1)
+
+# Incoming fraction defective
+p <- seq(0.001, 0.15, 0.001)
+
+# Specific incoming fraction defective
+p0 <- 0.0375
+
+# Two CSP-1 plans
+# Updated Plan 1
+# Plan 2 retained from the original practical
+
+f <- c(0.25, 0.10)
+i <- c(31, 57)
+
+# Specified AOQL
+AOQL <- 0.019
+
+# Fraction of non-defective units
+q <- 1 - p
+```
+
+**Calculation of AOQ**
+
+```{r}
+# AOQ curves for both plans
+
+AOQ1 <- p * (1-f[1]) * q^i[1] /
+  (f[1] + (1-f[1]) * q^i[1])
+
+AOQ2 <- p * (1-f[2]) * q^i[2] /
+  (f[2] + (1-f[2]) * q^i[2])
+
+# Maximum AOQ and corresponding incoming fraction defective
+
+AOQL1 <- max(AOQ1)
+AOQL2 <- max(AOQ2)
+
+p_max1 <- p[which.max(AOQ1)]
+p_max2 <- p[which.max(AOQ2)]
+
+round(c(AOQL_Plan1 = AOQL1,
+        AOQL_Plan2 = AOQL2,
+        p_at_max_Plan1 = p_max1,
+        p_at_max_Plan2 = p_max2), 8)
+```
+
+**Calculation of AFI at p = 0.0375**
+
+```{r}
+AFI1 <- f[1] /
+  (f[1] + (1-f[1]) * (1-p0)^i[1])
+
+AFI2 <- f[2] /
+  (f[2] + (1-f[2]) * (1-p0)^i[2])
+
+round(c(AFI_Plan1 = AFI1,
+        AFI_Plan2 = AFI2), 7)
+```
+
+**Calculation of OC at p = 0.0375**
+
+```{r}
+OC1 <- (1-p0)^i[1] /
+  (f[1] + (1-f[1]) * (1-p0)^i[1])
+
+OC2 <- (1-p0)^i[2] /
+  (f[2] + (1-f[2]) * (1-p0)^i[2])
+
+round(c(OC_Plan1 = OC1,
+        OC_Plan2 = OC2), 7)
+```
+
+**Comparison of Both Plans**
+
+```{r}
+Comparison <- data.frame(
+  Measure = c("Sampling Fraction (f)",
+              "Clearance Number (i)",
+              "Maximum AOQ (AOQL)",
+              "AFI at p = 0.0375",
+              "OC at p = 0.0375"),
+
+  Plan1 = c(f[1], i[1], AOQL1, AFI1, OC1),
+
+  Plan2 = c(f[2], i[2], AOQL2, AFI2, OC2)
+)
+
+Comparison[-c(1,2), 2:3] <-
+  round(Comparison[-c(1,2), 2:3], 7)
+
+Comparison
+```
+
+**Plotting AOQ Curves**
+
+```{r}
+plot(p, AOQ1, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 0.025),
+     xlab = "Incoming fraction defective (p)",
+     ylab = "Average Outgoing Quality (AOQ)",
+     main = "AOQ Curves for CSP-1 Plans")
+
+lines(p, AOQ2, col = "red", lwd = 2)
+
+abline(h = AOQL, lty = 2, col = "black")
+
+legend("topright",
+       legend = c("Plan 1 (f=0.25, i=31)",
+                  "Plan 2 (f=0.10, i=57)",
+                  "Specified AOQL = 0.019"),
+       col = c("blue", "red", "black"),
+       lty = c(1, 1, 2),
+       lwd = 2,
+       cex = 0.75)
+```
+
+**Plotting AFI Curves**
+
+```{r}
+AFI_curve1 <- f[1] /
+  (f[1] + (1-f[1]) * (1-p)^i[1])
+
+AFI_curve2 <- f[2] /
+  (f[2] + (1-f[2]) * (1-p)^i[2])
+
+plot(p, AFI_curve1, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 1),
+     xlab = "Incoming fraction defective (p)",
+     ylab = "Average Fraction Inspected (AFI)",
+     main = "AFI Curves for CSP-1 Plans")
+
+lines(p, AFI_curve2, col = "red", lwd = 2)
+
+legend("bottomright",
+       legend = c("Plan 1 (f=0.25, i=31)",
+                  "Plan 2 (f=0.10, i=57)"),
+       col = c("blue", "red"),
+       lty = 1,
+       lwd = 2,
+       cex = 0.75)
+```
+
+**Plotting OC Curves**
+
+```{r}
+OC_curve1 <- (1-p)^i[1] /
+  (f[1] + (1-f[1]) * (1-p)^i[1])
+
+OC_curve2 <- (1-p)^i[2] /
+  (f[2] + (1-f[2]) * (1-p)^i[2])
+
+plot(p, OC_curve1, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 1),
+     xlab = "Incoming fraction defective (p)",
+     ylab = "Probability of Acceptance (OC)",
+     main = "OC Curves for CSP-1 Plans")
+
+lines(p, OC_curve2, col = "red", lwd = 2)
+
+legend("topright",
+       legend = c("Plan 1 (f=0.25, i=31)",
+                  "Plan 2 (f=0.10, i=57)"),
+       col = c("blue", "red"),
+       lty = 1,
+       lwd = 2,
+       cex = 0.75)
+```
+
+# Results and Interpretation
+
+The two CSP-1 plans were evaluated using an incoming fraction defective ranging from 0.001 to 0.150.
+
+**Numerical Results**
+
+The maximum AOQ values obtained are:
+
+- Plan 1: 0.01897725 (1.8977%), occurring at p = 0.050.
+- Plan 2: 0.01896547 (1.8965%), occurring at p = 0.036.
+
+At p = 0.0375, the AFI and OC values are:
+
+| Measure | Plan 1 (f = 0.25) | Plan 2 (f = 0.10) |
+|:---|---:|---:|
+| Clearance number (i) | 31 | 57 |
+| Maximum AOQ / AOQL | 0.01897725 | 0.01896547 |
+| AFI | 0.5215480 | 0.4953463 |
+| OC | 0.6379360 | 0.5607264 |
+
+**Interpretation of Curves**
+
+The AOQ curves show that both plans satisfy the specified AOQL of 1.90% over the considered incoming-quality range. Plan 1 has a maximum AOQ of approximately 1.8977%, while Plan 2 has a maximum AOQ of approximately 1.8965%.
+
+The AFI curves indicate the average proportion of units inspected. At p = 0.0375, Plan 2 has a lower AFI of 49.5346% compared with 52.1548% for Plan 1. Therefore, Plan 2 requires less inspection effort.
+
+The OC curves represent the probability of acceptance. At p = 0.0375, Plan 1 has a higher OC value of 0.6379 compared with 0.5607 for Plan 2. Thus, Plan 2 has a lower probability of acceptance at this incoming fraction defective.
+
+# Conclusion
+
+The two CSP-1 plans were developed and compared for a specified AOQL of 1.90%.
+
+Plan 1 uses a sampling fraction of 0.25 and a clearance number of 31, whereas Plan 2 uses a sampling fraction of 0.10 and a clearance number of 57.
+
+The maximum AOQ values for both plans are below the specified AOQL of 0.019, indicating that both plans satisfy the required outgoing quality criterion over the considered range.
+
+At an incoming fraction defective of 0.0375, Plan 2 has a lower AFI of 0.4953463 compared with 0.5215480 for Plan 1. It also has a lower OC value of 0.5607264 compared with 0.6379360.
+
+Therefore, **Plan 2 is preferred** when the objective is to maintain the specified outgoing quality while reducing the average inspection effort.

@@ -1,0 +1,497 @@
+---
+title: "Practical 8"
+author: "Yash Jaiswal"
+date: "2026-11-25"
+output: html_document
+---
+
+
+# AIM
+
+To construct a \(\chi^2\) control chart and a contour plot (control ellipse) at \(\alpha=0.01\) for the bivariate quality characteristics tensile strength and diameter (Table 728), and to check whether the process is in statistical control.
+
+# PROBLEM
+
+Twenty samples of size \(n=4\) are taken, and two correlated quality characteristics are measured on each item:
+
+- Tensile strength (1000 kg).
+- Diameter (cm).
+
+Monitoring these characteristics using two separate \(\bar X\) charts ignores their correlation and may inflate the overall false-alarm rate.
+
+Therefore, a single multivariate control chart and a contour plot of the control region are constructed to determine whether the process is in statistical control.
+
+Given:
+
+- \(m=20\): Number of samples.
+- \(n=4\): Number of observations per sample.
+- \(p=2\): Number of quality characteristics.
+- \(\alpha=0.01\): Significance level.
+
+# THEORY
+
+## 1. Chi-Square Control Chart
+
+Let the sample mean vector for the \(i^{th}\) sample be:
+
+\[
+\bar{x}_i=
+\begin{pmatrix}
+\bar{x}_{1i}\\
+\bar{x}_{2i}
+\end{pmatrix}
+\]
+
+where \(\bar{x}_{1i}\) and \(\bar{x}_{2i}\) represent the sample means of tensile strength and diameter, respectively.
+
+### Target Values
+
+The estimated grand mean vector is:
+
+\[
+\hat{\mu}=
+\begin{pmatrix}
+\bar{\bar{x}}_1\\
+\bar{\bar{x}}_2
+\end{pmatrix}
+\]
+
+where:
+
+\[
+\hat{\mu}=\frac{1}{m}\sum_{i=1}^{m}\bar{x}_i
+\]
+
+The pooled covariance matrix is estimated by taking the average of the within-sample covariance matrices:
+
+\[
+\bar S=\frac{1}{m}\sum_{i=1}^{m}S_i
+\]
+
+where \(S_i\) is the sample covariance matrix of the \(i^{th}\) sample.
+
+### Chi-Square Statistic
+
+The chi-square statistic for the \(i^{th}\) sample is:
+
+\[
+\chi_i^2=
+n(\bar{x}_i-\hat{\mu})'
+\bar S^{-1}
+(\bar{x}_i-\hat{\mu})
+\]
+
+When the process is in control and the estimated target parameters are treated as known, this statistic follows a chi-square distribution with \(p\) degrees of freedom.
+
+\[
+\chi_i^2\sim\chi_p^2
+\]
+
+### Control Limits
+
+The upper control limit is:
+
+\[
+UCL=\chi^2_{1-\alpha,p}
+\]
+
+The lower control limit is:
+
+\[
+LCL=0
+\]
+
+For the given problem:
+
+\[
+\alpha=0.01,\quad p=2
+\]
+
+Therefore,
+
+\[
+UCL=\chi^2_{0.99,2}=9.210
+\]
+
+and
+
+\[
+LCL=0
+\]
+
+A sample for which:
+
+\[
+\chi_i^2>UCL
+\]
+
+indicates that the process mean vector may be out of statistical control.
+
+## 2. Control Ellipse (Contour Plot)
+
+The control ellipse is a graphical representation of the chi-square control region for two quality characteristics.
+
+The equation of the control ellipse is:
+
+\[
+n(\bar{x}-\hat{\mu})'
+\bar S^{-1}
+(\bar{x}-\hat{\mu})=
+\chi^2_{1-\alpha,p}
+\]
+
+For \(\alpha=0.01\) and \(p=2\):
+
+\[
+n(\bar{x}-\hat{\mu})'
+\bar S^{-1}
+(\bar{x}-\hat{\mu})=9.210
+\]
+
+The ellipse is centred at the estimated grand mean vector \(\hat{\mu}\).
+
+A sample mean lying outside the 99% control ellipse indicates that the corresponding sample is out of statistical control.
+
+The 95% ellipse is also plotted as a dashed reference curve for comparison.
+
+# CODE AND OUTPUT
+
+## 1. Entering the Data
+
+```{r data-entry}
+# Data for tensile strength (TS)
+TS <- matrix(c(
+66,70,68,72,
+75,60,70,75,
+65,70,70,65,
+72,70,75,65,
+73,74,72,70,
+72,74,73,74,
+63,62,65,66,
+75,84,75,66,
+65,69,77,71,
+70,68,67,67,
+80,75,70,69,
+68,65,80,50,
+74,80,76,74,
+76,74,75,73,
+71,70,74,73,
+68,67,70,69,
+72,76,75,77,
+76,74,75,77,
+72,74,73,75,
+72,68,74,70
+), ncol=4, byrow=TRUE)
+
+# Data for diameter (DI)
+DI <- matrix(c(
+16,18,15,20,
+17,22,18,19,
+20,18,15,18,
+19,20,15,17,
+21,21,23,19,
+21,19,20,18,
+22,20,24,22,
+22,20,20,22,
+18,16,18,18,
+18,17,19,18,
+24,18,20,22,
+20,21,20,22,
+19,17,20,21,
+20,17,18,18,
+18,16,17,18,
+18,16,19,20,
+22,19,23,20,
+19,23,20,21,
+20,18,20,19,
+21,19,18,20
+), ncol=4, byrow=TRUE)
+
+# Parameters
+m <- 20
+n <- 4
+p <- 2
+alpha <- 0.01
+
+# Display the data
+TS
+DI
+```
+
+## 2. Calculating Sample Means and Grand Mean
+
+The sample means of both quality characteristics are calculated for each sample.
+
+The grand mean vector is obtained by taking the average of the sample mean vectors.
+
+```{r sample-means}
+# Sample means
+xbar <- cbind(rowMeans(TS), rowMeans(DI))
+
+# Grand mean vector
+mu <- colMeans(xbar)
+
+# Display sample means and grand mean
+xbar
+mu
+```
+
+## 3. Calculating the Pooled Covariance Matrix
+
+The pooled covariance matrix is calculated by taking the average of the covariance matrices of all 20 samples.
+
+```{r covariance}
+# Initialise covariance matrix
+S <- matrix(0, 2, 2)
+
+# Calculate covariance matrix for each sample
+for (i in 1:m) {
+  S <- S + cov(cbind(TS[i, ], DI[i, ]))
+}
+
+# Pooled covariance matrix
+S <- S/m
+
+# Inverse of pooled covariance matrix
+Sinv <- solve(S)
+
+# Display covariance matrix and its inverse
+S
+Sinv
+```
+
+## 4. Calculating Chi-Square Statistics and Control Limits
+
+The chi-square statistic is calculated for each sample using the sample mean vector, grand mean vector and inverse of the pooled covariance matrix.
+
+The upper control limit is obtained using the `qchisq()` function.
+
+```{r chi-square}
+# Chi-square statistic for each sample
+chi2 <- apply(xbar, 1, function(x) {
+  n * t(x-mu) %*% Sinv %*% (x-mu)
+})
+
+# Upper control limit
+UCL <- qchisq(1-alpha, df=p)
+
+# Lower control limit
+LCL <- 0
+
+# Display control limits
+UCL
+LCL
+
+# Display chi-square statistics and out-of-control status
+result <- data.frame(
+  Sample = 1:m,
+  Chi2 = round(chi2, 3),
+  Out = chi2 > UCL
+)
+
+result
+```
+
+## 5. Chi-Square Control Chart
+
+The chi-square control chart is constructed by plotting the chi-square statistics against the sample numbers.
+
+The upper control limit is represented by a horizontal red dashed line. Samples exceeding the upper control limit are highlighted in red.
+
+```{r control-chart}
+# Chi-square control chart
+plot(
+  1:m, chi2,
+  type="o",
+  pch=16,
+  xlab="Sample",
+  ylab=expression(chi[0]^2),
+  main="Chi-Square Control Chart (alpha = 0.01)",
+  ylim=c(0, max(chi2, UCL)+1)
+)
+
+# Add upper control limit
+abline(h=UCL, col="red", lty=2)
+
+# Highlight out-of-control samples
+points(
+  which(chi2 > UCL),
+  chi2[chi2 > UCL],
+  col="red",
+  pch=16,
+  cex=1.5
+)
+
+# Add UCL label
+text(
+  m-2, UCL+0.5,
+  paste("UCL =", round(UCL,3)),
+  col="red"
+)
+```
+
+## 6. Contour Plot (Control Ellipse)
+
+The contour plot represents the control region for the two quality characteristics.
+
+The 95% and 99% control ellipses are plotted using the chi-square critical values. The sample mean vectors are also plotted, with out-of-control samples highlighted in red.
+
+```{r contour-plot}
+# Generate grid values
+x <- seq(
+  min(xbar[,1])-3,
+  max(xbar[,1])+3,
+  length=200
+)
+
+y <- seq(
+  min(xbar[,2])-2,
+  max(xbar[,2])+2,
+  length=200
+)
+
+# Calculate chi-square values over the grid
+z <- outer(
+  x, y,
+  Vectorize(function(a,b) {
+    d <- c(a,b)-mu
+    n*t(d)%*%Sinv%*%d
+  })
+)
+
+# Contour plot
+contour(
+  x, y, z,
+  levels=c(qchisq(0.95,2), UCL),
+  labels=c("95%", "99%"),
+  col=c("green","red"),
+  xlab="Mean tensile strength",
+  ylab="Mean diameter",
+  main="Control Ellipse at alpha = 0.01"
+)
+
+# Plot sample mean vectors
+points(
+  xbar,
+  pch=16,
+  col=ifelse(chi2>UCL,"red","blue")
+)
+
+# Add sample numbers
+text(
+  xbar,
+  labels=1:m,
+  pos=3,
+  cex=0.7
+)
+
+# Plot grand mean
+points(
+  mu[1], mu[2],
+  pch=3,
+  cex=1.5,
+  lwd=2
+)
+```
+
+# RESULTS AND INTERPRETATION
+
+## 1. Grand Mean Vector
+
+The estimated grand mean vector obtained from the R output is:
+
+\[
+\hat{\mu}=
+\begin{pmatrix}
+71.2625\\
+19.3000
+\end{pmatrix}
+\]
+
+Thus, the average tensile strength is 71.2625 and the average diameter is 19.3000.
+
+## 2. Pooled Covariance Matrix
+
+The pooled covariance matrix obtained from the R output is:
+
+\[
+\bar S=
+\begin{pmatrix}
+18.904167 & -1.479167\\
+-1.479167 & 2.675000
+\end{pmatrix}
+\]
+
+The negative off-diagonal elements indicate a negative estimated covariance between tensile strength and diameter.
+
+## 3. Control Limits
+
+The upper control limit is calculated as:
+
+\[
+UCL=\chi^2_{0.99,2}=9.21034
+\]
+
+The lower control limit is:
+
+\[
+LCL=0
+\]
+
+Therefore, the control limits are:
+
+\[
+\boxed{LCL=0,\quad UCL=9.210}
+\]
+
+## 4. Interpretation of Chi-Square Control Chart
+
+The calculated chi-square statistics for the 20 samples are compared with the upper control limit.
+
+Sample 7 has a chi-square statistic of:
+
+\[
+\chi_7^2=18.263
+\]
+
+Since:
+
+\[
+18.263>9.210
+\]
+
+Sample 7 lies beyond the upper control limit and indicates that the process mean vector is out of statistical control.
+
+All the remaining 19 samples have chi-square statistics below the upper control limit.
+
+Sample 8 and Sample 17 have values of 9.160, which are close to the upper control limit but remain within the control region.
+
+## 5. Interpretation of Contour Plot
+
+The contour plot displays the 95% and 99% control ellipses for the two quality characteristics.
+
+The 99% ellipse represents the control region at the specified significance level of 0.01.
+
+The sample mean corresponding to Sample 7 lies outside the 99% control ellipse, indicating that it is out of statistical control.
+
+All the other sample means lie inside the 99% control ellipse.
+
+The contour plot therefore supports the conclusion obtained from the chi-square control chart.
+
+# CONCLUSION
+
+The chi-square control chart and its corresponding control ellipse were successfully constructed for the bivariate quality characteristics tensile strength and diameter at a significance level of \(\alpha=0.01\).
+
+The calculated upper control limit is:
+
+\[
+\boxed{UCL=9.21034}
+\]
+
+The analysis shows that Sample 7 has a chi-square statistic of 18.263, which exceeds the upper control limit. Hence, Sample 7 is identified as an out-of-control sample.
+
+The remaining 19 samples lie within the control limits.
+
+The contour plot also confirms that Sample 7 lies outside the 99% control ellipse.
+
+Therefore, the process is **not in statistical control** because Sample 7 exhibits an out-of-control condition. Further investigation is required to identify the assignable cause responsible for this deviation.

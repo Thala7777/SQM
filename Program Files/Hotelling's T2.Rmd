@@ -1,0 +1,457 @@
+---
+title: "Practical 6"
+author: "Yash Jaiswal"
+date: '25237765036'
+output: html_document
+---
+### Aim 
+Construct Hotelling’s \(T^2\)  Control Chart & Contour Plot.
+
+### Problem
+
+Using the given data in which \(p=2\), \(m=20\), \(n=4\), \(\alpha=0.0054\), also plot hotelling \(T^2\) control chart and contour plot.
+
+
+| Samples | X1-1 | X1-2 | X1-3 | X1-4 | X2-1 | X2-2 | X2-3 | X2-4 |
+|:------:|------:|------:|------:|------:|------:|------:|------:|------:|
+| 1  | 80 | 82 | 78 | 85 | 19 | 22 | 20 | 20 |
+| 2  | 75 | 78 | 84 | 81 | 24 | 21 | 18 | 21 |
+| 3  | 83 | 86 | 84 | 87 | 19 | 24 | 21 | 22 |
+| 4  | 79 | 84 | 80 | 83 | 18 | 20 | 17 | 16 |
+| 5  | 82 | 81 | 78 | 86 | 23 | 21 | 18 | 22 |
+| 6  | 86 | 84 | 85 | 87 | 21 | 20 | 23 | 21 |
+| 7  | 84 | 88 | 82 | 85 | 19 | 23 | 19 | 22 |
+| 8  | 76 | 84 | 78 | 82 | 22 | 17 | 19 | 18 |
+| 9  | 85 | 88 | 85 | 87 | 18 | 16 | 20 | 16 |
+| 10 | 80 | 78 | 81 | 83 | 18 | 19 | 20 | 18 |
+| 11 | 86 | 84 | 85 | 86 | 23 | 20 | 24 | 22 |
+| 12 | 81 | 81 | 83 | 82 | 22 | 21 | 23 | 21 |
+| 13 | 81 | 86 | 82 | 79 | 16 | 18 | 20 | 19 |
+| 14 | 75 | 78 | 82 | 80 | 22 | 21 | 23 | 22 |
+| 15 | 77 | 84 | 78 | 85 | 22 | 19 | 21 | 18 |
+| 16 | 86 | 82 | 84 | 84 | 19 | 23 | 18 | 22 |
+| 17 | 84 | 85 | 78 | 79 | 17 | 22 | 18 | 19 |
+| 18 | 82 | 86 | 79 | 83 | 20 | 19 | 23 | 21 |
+| 19 | 79 | 88 | 85 | 83 | 21 | 23 | 20 | 18 |
+| 20 | 80 | 84 | 82 | 85 | 18 | 22 | 19 | 20 |
+
+### Theory
+
+
+
+#### 1. Multivariate Statistical Process Control
+
+Multivariate Statistical Process Control (MSPC) is used to monitor two or more correlated quality characteristics simultaneously. It considers the joint variation among variables and helps identify unusual changes in a process.
+
+In this practical, two quality characteristics, \(X_1\) and \(X_2\), are observed in 20 subgroups, each containing 4 observations. Therefore,
+
+$$
+m=20,\qquad n=4,\qquad p=2,
+$$
+
+where \(m\) is the number of subgroups, \(n\) is the subgroup size, and \(p\) is the number of quality characteristics.
+
+The observations are arranged in two matrices, \(X_1\) and \(X_2\), each having 20 rows and 4 columns. Each row represents one subgroup, and each column represents an observation within that subgroup.
+
+#### 2. Subgroup Means
+
+The subgroup mean for the first quality characteristic is calculated as
+
+$$
+\bar{X}_{1i}=\frac{1}{n}\sum_{j=1}^{n}X_{1ij},
+\qquad i=1,2,\ldots,m.
+$$
+
+Similarly, the subgroup mean for the second quality characteristic is
+
+$$
+\bar{X}_{2i}=\frac{1}{n}\sum_{j=1}^{n}X_{2ij},
+\qquad i=1,2,\ldots,m.
+$$
+
+The mean vector for subgroup \(i\) is
+
+$$
+\bar{\mathbf{X}}_i=
+\begin{pmatrix}
+\bar{X}_{1i}\\
+\bar{X}_{2i}
+\end{pmatrix}.
+$$
+
+The overall mean vector is obtained by averaging the subgroup means:
+
+$$
+\bar{\bar{\mathbf{X}}}
+=
+\begin{pmatrix}
+\bar{\bar{X}}_1\\
+\bar{\bar{X}}_2
+\end{pmatrix},
+$$
+
+where
+
+$$
+\bar{\bar{X}}_1=
+\frac{1}{m}\sum_{i=1}^{m}\bar{X}_{1i},
+$$
+
+and
+
+$$
+\bar{\bar{X}}_2=
+\frac{1}{m}\sum_{i=1}^{m}\bar{X}_{2i}.
+$$
+
+The overall mean vector represents the central location of the process across all subgroups.
+
+#### 3. Within-Subgroup Covariance Matrix
+
+The covariance matrix describes the variability of the quality characteristics and the relationship between them within each subgroup.
+
+For subgroup \(i\), the sample covariance matrix is
+
+$$
+S_i=
+\begin{pmatrix}
+s_{11,i} & s_{12,i}\\
+s_{21,i} & s_{22,i}
+\end{pmatrix},
+$$
+
+where \(s_{11,i}\) and \(s_{22,i}\) are the sample variances of the two characteristics, while \(s_{12,i}=s_{21,i}\) is their sample covariance.
+
+The pooled within-subgroup covariance matrix is calculated as
+
+$$
+\boxed{
+S=\frac{1}{m}\sum_{i=1}^{m}S_i
+}
+$$
+
+In this practical, the covariance matrix for each subgroup is calculated using the four paired observations of \(X_1\) and \(X_2\). The 20 covariance matrices are then averaged to obtain the pooled within-subgroup covariance matrix.
+
+This matrix accounts for the correlation between the two quality characteristics when calculating Hotelling's \(T^2\) statistic.
+
+#### 4. Hotelling's \(T^2\) Statistic
+
+Hotelling's \(T^2\) statistic is a multivariate extension of the univariate control-chart statistic. It measures the distance between a subgroup mean vector and the overall mean vector while accounting for the covariance between the quality characteristics.
+
+For subgroup \(i\), the statistic is defined as
+
+$$
+\boxed{
+T_i^2=
+n\left(\bar{\mathbf{X}}_i-
+\bar{\bar{\mathbf{X}}}\right)^T
+S^{-1}
+\left(\bar{\mathbf{X}}_i-
+\bar{\bar{\mathbf{X}}}\right)
+}
+$$
+
+where:
+
+- \(T_i^2\) is the Hotelling's \(T^2\) statistic for subgroup \(i\).
+- \(n\) is the subgroup size.
+- \(\bar{\mathbf{X}}_i\) is the mean vector of subgroup \(i\).
+- \(\bar{\bar{\mathbf{X}}}\) is the overall mean vector.
+- \(S^{-1}\) is the inverse of the pooled within-subgroup covariance matrix.
+- \(T\) denotes the transpose.
+
+Since the subgroup size is \(n=4\), the statistic becomes
+
+$$
+T_i^2=
+4\left(\bar{\mathbf{X}}_i-
+\bar{\bar{\mathbf{X}}}\right)^T
+S^{-1}
+\left(\bar{\mathbf{X}}_i-
+\bar{\bar{\mathbf{X}}}\right).
+$$
+
+A larger \(T^2\) value indicates that the subgroup mean vector is farther from the overall mean vector after accounting for the covariance structure.
+
+#### 5. Upper Control Limit
+
+The Upper Control Limit (UCL) is used to determine whether a subgroup exhibits an unusually large multivariate deviation.
+
+For the Phase I Hotelling's \(T^2\) chart using the pooled within-subgroup covariance matrix, the commonly used control limit is
+
+$$
+\boxed{
+UCL=
+\frac{p(m-1)(n-1)}
+{m(n-1)-p+1}
+F_{p,\,m(n-1)-p+1;\,1-\alpha}
+}
+$$
+
+where:
+
+- \(p\) is the number of quality characteristics.
+- \(m\) is the number of subgroups.
+- \(n\) is the subgroup size.
+- \(\alpha\) is the significance level.
+- \(F_{p,\,m(n-1)-p+1;\,1-\alpha}\) is the upper \(1-\alpha\) quantile of the F-distribution.
+
+For this practical,
+
+$$
+p=2,\qquad m=20,\qquad n=4,
+$$
+
+and
+
+$$
+\alpha=0.0054.
+$$
+
+The degrees of freedom are
+
+$$
+df_1=p=2,
+$$
+
+and
+
+$$
+df_2=m(n-1)-p+1.
+$$
+
+Substituting the values gives
+
+$$
+df_2=20(4-1)-2+1=59.
+$$
+
+Hence, the UCL is calculated using the F-distribution with 2 and 59 degrees of freedom.
+
+The decision rule is:
+
+- If \(T_i^2>UCL\), subgroup \(i\) is classified as out of control.
+- If \(T_i^2\leq UCL\), subgroup \(i\) is classified as in control according to the upper control limit.
+
+#### 6. Hotelling's \(T^2\) Control Chart
+
+The Hotelling's \(T^2\) control chart is constructed by plotting the \(T^2\) statistics against the subgroup numbers.
+
+The chart contains the calculated statistics and the UCL. Any point exceeding the UCL indicates a potentially unusual shift in the joint mean vector of the quality characteristics.
+
+Unlike separate univariate control charts, Hotelling's \(T^2\) chart considers both characteristics simultaneously and accounts for their covariance.
+
+#### 7. Hotelling's \(T^2\) Contour Plot
+
+A contour plot provides a two-dimensional representation of the Hotelling's \(T^2\) statistic for different combinations of subgroup means.
+
+For a mean vector
+
+$$
+\mathbf{x}=
+\begin{pmatrix}
+x_1\\
+x_2
+\end{pmatrix},
+$$
+
+the squared Mahalanobis distance contour is defined by
+
+$$
+\boxed{
+T^2(\mathbf{x})=
+n(\mathbf{x}-\bar{\bar{\mathbf{X}}})^T
+S^{-1}
+(\mathbf{x}-\bar{\bar{\mathbf{X}}})
+}
+$$
+
+The control contour is obtained by setting
+
+$$
+T^2(\mathbf{x})=UCL.
+$$
+
+This equation represents an ellipse centred at the overall mean vector when the covariance matrix is positive definite.
+
+In the contour plot:
+
+- The blue points represent the subgroup mean vectors.
+- The black cross represents the overall mean vector.
+- The red contour represents the boundary corresponding to the UCL.
+
+Subgroup means lying outside the contour have \(T^2\) values greater than the UCL and are classified as out of control. Subgroup means inside the contour satisfy the upper control limit criterion.
+
+#### 8. Assumptions
+
+The analysis relies on the following assumptions:
+
+1. The quality characteristics follow an approximately multivariate normal distribution.
+2. The subgroups are independent of one another.
+3. The observations within each subgroup are collected under comparable process conditions.
+4. The within-subgroup covariance matrix is representative of the process variability.
+5. The covariance matrix is nonsingular and invertible.
+
+The control limits are based on the specified Phase I Hotelling's \(T^2\) formulation. Their interpretation depends on the assumptions and on the suitability of the pooled covariance estimate.
+```{r}
+# DATA 
+X1 <- matrix(c(
+  80,82,78,85, 75,78,84,81, 83,86,84,87, 79,84,80,83,
+  82,81,78,86, 86,84,85,87, 84,88,82,85, 76,84,78,82,
+  85,88,85,87, 80,78,81,83, 86,84,85,86, 81,81,83,82,
+  81,86,82,79, 75,78,82,80, 77,84,78,85, 86,82,84,84,
+  84,85,78,79, 82,86,79,83, 79,88,85,83, 80,84,82,85
+), ncol=4, byrow=TRUE)
+
+X2 <- matrix(c(
+  19,22,20,20, 24,21,18,21, 19,24,21,22, 18,20,17,16,
+  23,21,18,22, 21,20,23,21, 19,23,19,22, 22,17,19,18,
+  18,16,20,16, 18,19,20,18, 23,20,24,22, 22,21,23,21,
+  16,18,20,19, 22,21,23,22, 22,19,21,18, 19,23,18,22,
+  17,22,18,19, 20,19,23,21, 21,23,20,18, 18,22,19,20
+), ncol=4, byrow=TRUE)
+
+# SUBGROUP MEANS 
+xbar1 <- rowMeans(X1)
+xbar2 <- rowMeans(X2)
+
+xbar <- c(mean(xbar1), mean(xbar2))
+xbar
+
+#WITHIN-SUBGROUP COVARIANCE
+S_list <- lapply(1:20, function(i) {
+  cov(cbind(X1[i,], X2[i,]))
+})
+
+S <- Reduce("+", S_list) / 20
+S
+
+# HOTELLING \(T^2\) 
+T2 <- numeric(20)
+
+for(i in 1:20) {
+  d <- c(xbar1[i], xbar2[i]) - xbar
+  T2[i] <- 4 * t(d) %*% solve(S) %*% d
+}
+
+T2 <- as.numeric(T2)
+
+# CONTROL LIMIT 
+p <- 2
+m <- 20
+n <- 4
+alpha <- 0.0054
+
+df1 <- p
+df2 <- m*(n-1) - p + 1
+
+UCL <- (p*(m-1)*(n-1)/df2) * qf(1-alpha, df1, df2)
+
+cat("UCL =", UCL, "\n")
+
+#  CONTROL CHART 
+plot(1:m, T2, type="o", pch=19, col="blue",
+     xlab="Sample Number",
+     ylab=expression(T^2),
+     main="Hotelling's T² Control Chart")
+
+abline(h=UCL, col="red", lwd=2, lty=2)
+
+text(1:m, T2, labels=round(T2,2),
+     pos=3, cex=0.7)
+
+legend("topright",
+       legend=c("T² statistic","UCL = 11.03664"),
+       col=c("blue","red"),
+       lty=c(1,2), pch=c(19,NA))
+
+#  CONTOUR PLOT
+# Mahalanobis T² contours for subgroup means
+
+x <- seq(min(xbar1)-3, max(xbar1)+3, length=200)
+y <- seq(min(xbar2)-3, max(xbar2)+3, length=200)
+
+grid <- expand.grid(X1=x, X2=y)
+
+D <- as.matrix(grid) -
+  matrix(xbar, nrow=nrow(grid), ncol=2, byrow=TRUE)
+
+Z <- 4 * rowSums((D %*% solve(S)) * D)
+Z <- matrix(Z, nrow=length(x), ncol=length(y))
+
+contour(x, y, Z,
+        levels=UCL,
+        lwd=2, col="red",
+        xlab="X1 subgroup mean",
+        ylab="X2 subgroup mean",
+        main="Hotelling's T² Contour Plot")
+
+points(xbar1, xbar2, pch=19, col="blue")
+points(xbar[1], xbar[2], pch=4, cex=2, lwd=2)
+
+text(xbar1, xbar2, labels=1:20,
+     pos=3, cex=0.7)
+legend("topright",
+       legend=c("Subgroup means","Overall mean","T² control contour"),
+       col=c("blue","black","red"),
+       pch=c(19,4,NA), lty=c(NA,NA,1))
+
+
+```
+
+
+### Results
+
+The Hotelling's \(T^2\) control chart was constructed to monitor two correlated quality characteristics, \(X_1\) and \(X_2\), simultaneously, using 20 subgroups, each containing 4 observations.
+
+The overall mean vector obtained was
+
+\[
+\bar{\mathbf{x}} =
+\begin{pmatrix}
+82.4625\\
+20.1750
+\end{pmatrix}
+\]
+
+The pooled within-subgroup covariance matrix was
+
+\[
+S =
+\begin{pmatrix}
+7.5125 & -0.3542\\
+-0.3542 & 3.2917
+\end{pmatrix}
+\]
+
+The upper control limit (UCL) was calculated using the F-distribution as
+
+\[
+\mathrm{UCL}
+=
+\frac{p(m-1)(n-1)}
+{m(n-1)-p+1}
+F_{1-\alpha;\,p,\,m(n-1)-p+1}
+\]
+
+where \(p=2\), \(m=20\), \(n=4\), and \(\alpha=0.0054\).
+
+The calculated upper control limit was
+
+\[
+\boxed{\mathrm{UCL}=11.03664}
+\]
+
+### Interpretation
+
+1. **Overall mean:** The average values of the two quality characteristics were 82.4625 for \(X_1\) and 20.1750 for \(X_2\).
+
+2. **Covariance matrix:** The variances of \(X_1\) and \(X_2\) were 7.5125 and 3.2917, respectively. The covariance of \(-0.3542\) indicates a slight negative linear association between the two characteristics within subgroups.
+
+3. **Hotelling's \(T^2\) control chart:** The blue points represent the \(T^2\) statistics for the 20 subgroups, and the red dashed line represents the upper control limit of 11.03664. Any subgroup with a \(T^2\) value exceeding this limit signals a potential out-of-control condition.
+
+4. **Contour plot:** The blue points represent the subgroup means, the black cross represents the overall mean vector, and the red contour represents the \(T^2\) control boundary. Points outside the contour indicate potential out-of-control subgroups.
+
+5. **Joint monitoring:** Hotelling's \(T^2\) statistic considers both quality characteristics simultaneously, accounting for their variances and covariance. Therefore, it can identify unusual multivariate variation that may not be evident when examining each characteristic separately.
+
+The specific out-of-control subgroup numbers must be identified from the plotted \(T^2\) values or by comparing each value with the UCL.

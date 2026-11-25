@@ -1,0 +1,432 @@
+---
+title: "Practical 10"
+author: "Yash Jaiswal"
+date: '25237765036'
+output: html_document
+---
+
+### Aim
+
+To find the parameters n and k of a variables sampling plan with known standard deviation (sigma) for a lower specification limit, given an Acceptable Quality Level (AQL) of 3%, which should be accepted 94% of the time, and a Lot Tolerance Percent Defective (LTPD) of 8%, which should be accepted 7% of the time. To describe the operation of the sampling plan and draw its Operating Characteristic (OC) curve with the AQL and LTPD marked.
+
+### Practical
+
+
+The lower specification limit for the breaking strength of yarn is LSL = 25 g. The breaking strength is normally distributed with known process variance sigma^2 = 6.
+
+Lots whose mean is such that 3% of the product is nonconforming should be accepted 94% of the time, whereas lots whose mean is such that 8% of the product is nonconforming should be accepted 7% of the time.
+
+The following tasks are to be performed:
+
+1. Find the parameters of the variables sampling plan.
+2. Describe the operation of the sampling plan.
+3. Draw the OC curve and mark the AQL and LTPD on it.
+
+**Given Information:**
+
+| Quantity | Symbol | Value |
+|:---|:---:|---:|
+| Lower specification limit | LSL | 25 g |
+| Process variance | sigma^2 | 6 |
+| Process standard deviation | sigma | sqrt(6) |
+| Acceptable Quality Level | p1 | 0.03 |
+| Producer's risk | alpha | 0.06 |
+| Probability of acceptance at AQL | 1-alpha | 0.94 |
+| Lot Tolerance Percent Defective | p2 | 0.08 |
+| Consumer's risk | beta | 0.07 |
+
+### Theory
+
+A variables sampling plan is a statistical quality control technique in which the actual measured values of a quality characteristic are used to make decisions about accepting or rejecting a lot. Unlike an attributes sampling plan, which classifies each item as either conforming or nonconforming, a variables sampling plan uses quantitative measurements such as weight, length, strength, or diameter.
+
+Since more information is obtained from the measured values, variables sampling plans generally require smaller sample sizes than attributes sampling plans providing comparable protection.
+
+In this problem, the breaking strength of yarn follows a normal distribution with a known standard deviation and a single lower specification limit.
+
+**1. Fraction Nonconforming**
+
+Let X represent the breaking strength of yarn, where
+
+$$
+X \sim N(mu, sigma^2)
+$$
+
+The lower specification limit is LSL = 25 g.
+
+An item is considered nonconforming if its breaking strength is below the lower specification limit.
+
+Therefore, the fraction nonconforming is
+
+$$
+p = P(X < LSL)
+$$
+
+Standardizing the normal variable,
+
+$$
+p = Phi((LSL-mu)/sigma)
+$$
+
+Equivalently,
+
+$$
+(mu-LSL)/sigma = Phi^{-1}(1-p)
+$$
+
+Thus, the lot mean corresponding to a given fraction nonconforming is
+
+$$
+mu = LSL + z_p sigma
+$$
+
+where z_p = Phi^{-1}(1-p) is the upper p-point of the standard normal distribution.
+
+**2. Variables Sampling Plan**
+
+A random sample of size n is selected from the lot, and its sample mean X-bar is calculated.
+
+The lot is accepted if
+
+$$
+X-bar >= LSL + k sigma
+$$
+
+where n is the sample size and k is the acceptance constant.
+
+If the sample mean is greater than or equal to the acceptance limit, the lot is accepted. Otherwise, the lot is rejected.
+
+**3. Probability of Acceptance and OC Curve**
+
+The probability of accepting a lot having fraction nonconforming p is called the probability of acceptance, denoted by Pa(p).
+
+Since
+
+$$
+X-bar \sim N(mu, sigma^2/n)
+$$
+
+the probability of acceptance is
+
+$$
+Pa(p) = P(X-bar >= LSL + k sigma)
+$$
+
+Therefore,
+
+$$
+Pa(p) = Phi[sqrt(n)(Phi^{-1}(1-p)-k)]
+$$
+
+The Operating Characteristic (OC) curve is a graphical representation of the probability of acceptance against the fraction nonconforming in a lot.
+
+**4. AQL and Producer's Risk**
+
+The Acceptable Quality Level (AQL) is the quality level considered satisfactory for the purpose of lot acceptance.
+
+Here,
+
+$$
+p_1 = 0.03
+$$
+
+The probability of acceptance at the AQL is 0.94.
+
+Producer's risk is the probability of rejecting a lot of acceptable quality.
+
+$$
+alpha = 1-0.94 = 0.06
+$$
+
+**5. LTPD and Consumer's Risk**
+
+The Lot Tolerance Percent Defective (LTPD) represents a poor quality level that the consumer considers unacceptable.
+
+Here,
+
+$$
+p_2 = 0.08
+$$
+
+The probability of acceptance at the LTPD is 0.07.
+
+Consumer's risk is the probability of accepting a lot of poor quality.
+
+$$
+beta = 0.07
+$$
+
+**6. Determination of Sample Size and Acceptance Constant**
+
+At the AQL,
+
+$$
+Pa(p_1) = 1-alpha
+$$
+
+Therefore,
+
+$$
+sqrt(n)(z_p1-k) = z_(1-alpha)
+$$
+
+At the LTPD,
+
+$$
+Pa(p_2) = beta
+$$
+
+Therefore,
+
+$$
+sqrt(n)(z_p2-k) = -z_(1-beta)
+$$
+
+Solving these equations gives the sample size:
+
+$$
+n = [(z_(1-alpha)+z_(1-beta))/(z_p1-z_p2)]^2
+$$
+
+The acceptance constant is
+
+$$
+k = (z_p1*z_(1-beta)+z_p2*z_(1-alpha))/(z_(1-alpha)+z_(1-beta))
+$$
+
+The calculated sample size is rounded up to the next integer to obtain a feasible sampling plan.
+
+**7. Interpretation of the OC Curve**
+
+The OC curve illustrates how the probability of acceptance changes as the fraction nonconforming increases.
+
+- At the AQL of 3%, the probability of acceptance is approximately 94%.
+- At the LTPD of 8%, the probability of acceptance is approximately 7%.
+- As the fraction nonconforming increases, the probability of acceptance decreases.
+
+### Code
+
+```{r}
+# Lower specification limit and known process standard deviation
+LSL <- 25
+sigma <- sqrt(6)
+
+# AQL with producer's risk, LTPD with consumer's risk
+p1 <- 0.03
+alpha <- 1 - 0.94
+p2 <- 0.08
+beta <- 0.07
+
+# Standard normal deviates
+z_p1 <- qnorm(1 - p1)
+z_p2 <- qnorm(1 - p2)
+z_alpha <- qnorm(1 - alpha)
+z_beta <- qnorm(1 - beta)
+
+c(z_p1 = z_p1, z_p2 = z_p2,
+  z_alpha = z_alpha, z_beta = z_beta)
+
+# Sample size and acceptance constant
+n_exact <- ((z_alpha + z_beta) /
+            (z_p1 - z_p2))^2
+
+n <- ceiling(n_exact)
+
+k <- (z_p1 * z_beta + z_p2 * z_alpha) /
+     (z_alpha + z_beta)
+
+c(n_exact = n_exact, n = n, k = k)
+
+# Acceptance limit and lot means
+xbar_A <- LSL + k * sigma
+
+mu1 <- LSL + z_p1 * sigma
+mu2 <- LSL + z_p2 * sigma
+
+c(sigma = sigma, xbar_A = xbar_A,
+  mu_AQL = mu1, mu_LTPD = mu2)
+
+# Probability of acceptance
+Pa <- function(p) {
+  pnorm(sqrt(n) * (qnorm(1 - p) - k))
+}
+
+c(Pa_AQL = Pa(p1), Pa_LTPD = Pa(p2))
+
+# OC curve against lot fraction nonconforming
+p <- seq(0.001, 0.15, by = 0.001)
+
+plot(p, Pa(p), type = "l", lwd = 2, col = "blue",
+     main = "OC Curve of the Variables Sampling Plan",
+     xlab = "Lot fraction nonconforming (p)",
+     ylab = "Probability of acceptance")
+
+abline(v = c(p1, p2), lty = 2,
+       col = c("darkgreen", "red"))
+
+abline(h = c(1 - alpha, beta),
+       lty = 3, col = "grey40")
+
+points(c(p1, p2), Pa(c(p1, p2)),
+       pch = 19,
+       col = c("darkgreen", "red"),
+       cex = 1.3)
+
+text(p1, Pa(p1), "AQL", pos = 4,
+     col = "darkgreen")
+
+text(p2, Pa(p2), "LTPD", pos = 4,
+     col = "red")
+
+legend("right",
+       legend = c("OC curve", "AQL = 0.03",
+                  "LTPD = 0.08"),
+       col = c("blue", "darkgreen", "red"),
+       lty = c(1, 2, 2),
+       lwd = c(2, 1, 1),
+       bty = "n")
+
+# OC curve against lot mean breaking strength
+mu <- seq(26, 33, by = 0.01)
+
+Pa_mu <- pnorm((mu - xbar_A) /
+               (sigma / sqrt(n)))
+
+plot(mu, Pa_mu, type = "l", lwd = 2, col = "blue",
+     main = "OC Curve against the Lot Mean",
+     xlab = "Lot mean breaking strength (g)",
+     ylab = "Probability of acceptance")
+
+abline(v = c(mu2, xbar_A, mu1),
+       lty = c(2, 3, 2),
+       col = c("red", "black", "darkgreen"))
+
+points(c(mu1, mu2), Pa(c(p1, p2)),
+       pch = 19,
+       col = c("darkgreen", "red"),
+       cex = 1.3)
+
+legend("bottomright",
+       legend = c("OC curve", "Mean at AQL",
+                  "Acceptance limit", "Mean at LTPD"),
+       col = c("blue", "darkgreen", "black", "red"),
+       lty = c(1, 2, 3, 2),
+       lwd = c(2, 1, 1, 1),
+       bty = "n")
+```
+
+### Results and Interpretation
+
+**1. Standard Normal Deviates**
+
+The standard normal deviates obtained are:
+
+| Deviate | Value |
+|:---|---:|
+| z_p1 | 1.880794 |
+| z_p2 | 1.405072 |
+| z_(1-alpha) | 1.554774 |
+| z_(1-beta) | 1.475791 |
+
+**2. Sample Size and Acceptance Constant**
+
+The calculated values are:
+
+| Parameter | Value |
+|:---|---:|
+| Exact sample size | 40.582663 |
+| Final sample size (n) | 41 |
+| Acceptance constant (k) | 1.636733 |
+
+Therefore, the required variables sampling plan is
+
+$$
+n = 41, \quad k = 1.636733
+$$
+
+**3. Acceptance Limit and Lot Means**
+
+The process standard deviation is
+
+$$
+sigma = sqrt(6) = 2.44949
+$$
+
+The acceptance limit for the sample mean is
+
+$$
+X-bar_A = LSL + k sigma
+$$
+
+$$
+= 25 + (1.636733)(2.44949)
+$$
+
+$$
+X-bar_A = 29.00916 \text{ g}
+$$
+
+The lot mean corresponding to the AQL is
+
+$$
+mu_AQL = 25 + (1.880794)(2.44949)
+$$
+
+$$
+mu_AQL = 29.60698 \text{ g}
+$$
+
+The lot mean corresponding to the LTPD is
+
+$$
+mu_LTPD = 25 + (1.405072)(2.44949)
+$$
+
+$$
+mu_LTPD = 28.44171 \text{ g}
+$$
+
+**4. Probability of Acceptance**
+
+The calculated probabilities of acceptance are:
+
+| Quality Level | Required Probability | Calculated Probability |
+|:---|---:|---:|
+| AQL = 0.03 | 0.94 | 0.940944 |
+| LTPD = 0.08 | 0.07 | 0.068989 |
+
+The calculated values are very close to the specified probabilities. The slight difference occurs because the exact sample size of 40.582663 has been rounded up to 41.
+
+**5. Operation of the Sampling Plan**
+
+The sampling plan operates as follows:
+
+1. Select a random sample of 41 yarn specimens from the lot.
+2. Measure the breaking strength of each specimen.
+3. Calculate the sample mean breaking strength.
+4. Compare the sample mean with the acceptance limit of 29.00916 g.
+5. Accept the lot if the sample mean is greater than or equal to 29.00916 g.
+6. Reject the lot if the sample mean is less than 29.00916 g.
+
+Thus, the decision rule is
+
+$$
+\text{Accept the lot if } \bar X \geq 29.00916 \text{ g}
+$$
+
+Otherwise, reject the lot.
+
+**6. Interpretation of the OC Curve**
+
+The first OC curve represents the relationship between the lot fraction nonconforming and the probability of acceptance.
+
+The curve shows that the probability of acceptance decreases as the fraction nonconforming increases.
+
+- At the AQL of 3%, the probability of acceptance is approximately 94.09%.
+- At the LTPD of 8%, the probability of acceptance is approximately 6.90%.
+
+The second OC curve represents the relationship between the lot mean breaking strength and the probability of acceptance.
+
+It shows that lots having higher mean breaking strength have a greater probability of acceptance, whereas lots having lower mean breaking strength have a smaller probability of acceptance.
+
+The vertical line at 29.00916 g represents the acceptance limit for the sample mean.
+

@@ -1,0 +1,343 @@
+---
+title: "Practical 4"
+author: "Deepak Kumar Bharti"
+date: '25056765013'
+output: html_document
+---
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### **Aim :**
+To construct Chi-square control chart and also plot the control contour.
+
+#### **Problem :**
+When we are monitoring a process with $p=2$ continuously for **temperature and pressure**. Then the process has establish the known population parameter, i.e. **mean vector**
+$$
+\mu =
+\begin{bmatrix}
+\mu_1 \\
+\mu_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+50 \\
+100
+\end{bmatrix}
+$$
+and **variance-covariance matrix** is 
+$$
+\Sigma =
+\begin{bmatrix}
+10 & 20 \\
+20 & 50
+\end{bmatrix}
+$$
+If the sample vector are :
+$$
+X_1 =
+\begin{bmatrix}
+54 \\
+108
+\end{bmatrix}, \qquad
+X_2 =
+\begin{bmatrix}
+54 \\
+92
+\end{bmatrix}
+$$
+
+then construct the **chi-square control chart** with $2-d.f.$
+
+In both cases draw the control plot for chi-square Control Limits or calculated Control Limits with respect to tabulated Control Limits
+
+#### **Theory :**
+
+##### **<u>Chi-Square Control Chart</u>**
+A **chi-square control chart** is a statistical process control technique used to monitor a **multivariate process**, where two or more quality characteristics are measured simultaneously.
+
+When the process mean vector and covariance matrix are known, the chi-square statistic is used to determine whether an observation is consistent with the normal operating condition of the process.
+
+- ##### **Mahalanobis Distance**
+  For an observation vector $X$, with known mean vector $\mu$ and covariance matrix $\Sigma$, the squared Mahalanobis distance is
+$$
+\chi^2 = (X-\mu)^T\Sigma^{-1}(X-\mu)
+$$
+
+  If the observations follow a multivariate normal distribution,
+$$
+X \sim N_p(\mu,\Sigma)
+$$
+
+  then
+$$
+\chi^2 \sim \chi^2_p
+$$
+
+  where $p$ is the number of quality characteristics.
+
+- ##### **Control Limits**
+  For the chi-square control chart, the control limits are:
+  Center Line :
+$$
+CL = p
+$$
+
+  Lower Control Limit :
+$$
+LCL = 0
+$$
+  
+  Upper Control Limit :
+$$
+UCL = \chi^2_{p,1-\alpha}
+$$
+
+  where:
+
+  - $p$ = number of variables
+  - $\alpha$ = significance level
+  - $\chi^2_{p,1-\alpha}$ = $1-\alpha$ quantile
+  of the chi-square distribution with $p$ degrees
+  of freedom.
+  
+- ##### **Decision Rule**
+  For each sample, calculate
+$$
+\chi_i^2=(X_i-\mu)^T\Sigma^{-1}(X_i-\mu)
+$$
+
+  The decision rule is:
+    
+  - If $\chi_i^2 \leq UCL$, the process is **in
+  control**.
+  - If $\chi_i^2 > UCL$, the process is **out of
+  control**.
+
+  The LCL is zero because the squared Mahalanobis
+  distance cannot be negative.
+
+- ##### **Control Contour**
+  The chi-square control chart can also be represented graphically by a **control contour**.
+
+  The control contour is given by
+$$
+(X-\mu)^T\Sigma^{-1}(X-\mu)
+=
+\chi^2_{p,1-\alpha}
+$$
+
+  For two variables ($p=2$), this equation forms/represents an **ellipse** centered at the process mean $\mu$.
+
+  - Points **inside the ellipse** indicate an **in-control** process.
+  - Points **outside the ellipse** indicate an **out-of-control** process.
+
+
+#### **Code and Calculation :**
+Here 
+
+ - $X_1$ : represents the **Temperature**
+ - $X_2$ : represents the **Pressure**
+```{r}
+# -: Chi-square control chart :-
+
+# Given
+alpha <- 0.0027
+p <- 2
+
+# Control limits
+CL  <- p
+LCL <- 0
+UCL <- qchisq(1 - alpha, df = p)
+
+cat("The Center Line (CL) is :", CL)
+cat("The Lower Control Limit (LCL) is :", LCL)
+cat("The Upper Control Limit (UCL) is :", UCL)
+
+# Known population mean
+mu <- c(50, 100)
+
+# Given covariance matrix
+Sigma <- matrix(c(10, 20,
+              20, 50), nrow = 2, byrow = TRUE)
+
+# Inverse of covariance matrix
+Sigma_inv <- solve(Sigma)
+
+# Observations
+X <- rbind(
+  X1 = c(54, 108),
+  X2 = c(54, 92)
+)
+
+# Calculate chi-square statistics
+chisq.stat <- apply(X, 1, function(x) {
+  d <- x - mu
+  t(d) %*% Sigma_inv %*% d
+})
+
+chisq.stat <- as.numeric(chisq.stat)
+
+# Display results
+results <- data.frame(
+  Observation = rownames(X),
+  Chi_square = chisq.stat,
+  Status = ifelse(chisq.stat > UCL,
+                  "Out of control",
+                  "In control")
+)
+
+print(results)
+
+# -: Manually Ploting chi-square control chart :-
+plot(1:2, chisq.stat,
+     type = "b",
+     pch = 19,
+     xaxt = "n",
+     xlab = "Sample",
+     ylab = expression(chi^2),
+     main = expression(paste(chi^2, "Control Chart")),
+     ylim = c(0, 30),
+     xlim = c(0.8, 2.7))
+
+# X-axis labels
+axis(1, at = 1:2, labels = c("X1", "X2"))
+
+# Control lines
+abline(h = UCL, lty = 2, lwd = 2)
+abline(h = CL,  lty = 3, lwd = 2)
+abline(h = LCL, lty = 2, lwd = 2)
+
+# Control limit labels
+text(2.1, UCL, paste0("UCL = ", round(UCL, 3)), pos = 4)
+text(2.1, CL,  paste0("CL = ", CL), pos = 4)
+text(2.1, LCL, paste0("LCL = ", LCL), pos = 4)
+
+# Highlight out-of-control point
+points(which(chisq.stat > UCL),
+       chisq.stat[chisq.stat > UCL],
+       pch = 19)
+
+# Legend
+legend("topleft",
+       legend = c("Statistic", "UCL", "CL", "LCL"),
+       lty = c(1, 2, 3, 2),
+       pch = c(19, NA, NA, NA),
+       bty = "n")
+
+# -: Ploting chi-square control chart using QCC package :-
+# Installing the required libraries
+# install.packages("qcc")
+library(qcc)
+
+qcc.chisq <- qcc(
+  chisq.stat,
+  type = "xbar.one",
+  center = CL,
+  limits = c(LCL, UCL),
+  labels = rownames(X),
+  title = expression(Chi-square ~ "Control Chart using in-built package QCC"),
+  xlab = "Sample",
+  ylab = expression(chi^2)
+)
+```
+
+```{r}
+# -: Chi-square contour plot :-
+
+# Installing the required libraries
+# install.packages("ellipse")
+library(ellipse)
+
+# Critical chi-square value
+crit <- qchisq(1 - alpha, df = 2)
+
+# Generating control ellipse
+ell <- ellipse(
+  x = Sigma,
+  centre = mu,
+  level = 1 - alpha,
+  npoints = 500
+)
+
+# Ploting
+plot(ell,
+     type = "l",
+     lwd = 2,
+     asp = 1,
+     xlab = expression(mu[1]),
+     ylab = expression(mu[2]),
+     main = expression(paste(
+       chi^2, " Control Contour"
+     )))
+
+# Adding process mean
+points(mu[1], mu[2],
+       pch = 4,
+       cex = 1.5,
+       lwd = 2)
+
+# Adding observations
+points(X[,1], X[,2],
+       pch = 19)
+
+text(X[,1], X[,2],
+     labels = rownames(X),
+     pos = 4)
+
+legend("topright",
+       legend = c("Control contour",
+                  "Process mean",
+                  "Observations"),
+       lty = c(1, NA, NA),
+       pch = c(NA, 4, 19),
+       bty = "n")
+```
+
+#### **Results :**
+The $\chi^2$ control chart was constructed for $p=2$ variables at a significance level of $\alpha=0.0027$.
+
+The calculated control limits are:
+$$
+CL=p=2
+$$
+
+$$
+LCL=0
+$$
+
+$$
+UCL=\chi^2_{2,0.9973}=11.82901
+$$
+
+The calculated $\chi^2$ values and their status are:
+
+| Observation | Temprature | Pressure | $\chi^2$ value | Status |
+|:-----------:|:-----------:|:-----------:|:-----------:|:-----------:|
+| $X_1$ | 54 | 108 | 1.6 | In control |
+| $X_2$ | 54 | 92 | 27.2 | Out of control |
+
+From the $\chi^2$ control chart, $X_1$ lies below the upper control limit, whereas $X_2$ lies above the upper control limit.
+
+Therefore, the first observation $X_1$ with **Temperature = 54 and Pressure = 108**, is **within the control limits** and hence represents an **in-control** condition because
+$$
+1.6 < 11.82901.
+$$
+
+However, the second observation $X_2$ with **Temperature = 54 and Pressure = 92**, is **outside the control limits** and hence represents an **out of control** condition because
+$$
+27.2 > 11.82901.
+$$
+
+The $\chi^2$ control contour is an ellipse centered at the process mean
+$$
+\mu=(50,100).
+$$
+
+Here, the $\chi^2$ control contour gives the same conclusion: $X_1$ lies **inside the control contour**, whereas $X_2$ lies **outside the control contour**.
+
+#### **Conclusions :**
+Thus, the multivariate process is **not completely in control**, because the second observation indicates an abnormal change in the combined **temperature-pressure** process. Since temperature remains at 54 for both observations, the major change between the two observations is the **pressure**, which decreases from 108 to 92 and make the process **out of control**.
+

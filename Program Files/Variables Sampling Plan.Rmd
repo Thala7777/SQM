@@ -1,0 +1,342 @@
+---
+title: "Practical 9"
+author: "Sudhanshu Ranjan"
+date: '25056765011'
+output: html_document
+---
+
+### Aim
+
+To determine the parameters of a single variables sampling plan for yarn breaking strength using the normal distribution and to study its performance using OC, AOQ, and LTPD.
+
+### Problem
+
+The lower specification limit (LSL) for the breaking strength of yarn is 25 g. The distribution of breaking strength of yarn follows a normal distribution with a variance of 6.
+
+It is desirable that lots with a mean such that 3% of the product is non-conforming should be accepted 94% of the time, whereas lots with a mean such that 8% of the product is non-conforming should be accepted 7% of the time.
+
+Find the parameters of the variables sampling plan and describe its operation. Also, plot the following:
+
+1. OC Curve (Operating Characteristic Curve).
+2. AOQ Curve (Average Outgoing Quality Curve).
+3. LTPD (Lot Tolerance Percent Defective).
+
+### Theory
+
+#### Variables Sampling Plan
+
+A variables sampling plan is a statistical quality control technique in which a measurable quality characteristic of a product is inspected.
+
+Examples include:
+
+- Breaking strength of yarn.
+- Length of a product.
+- Weight of a product.
+- Diameter of a component.
+
+In this practical, the breaking strength of yarn is measured in grams.
+
+Since the breaking strength follows a normal distribution and the population variance is known, a variables sampling plan based on the normal distribution is used.
+
+#### Acceptance Criterion
+
+For a lower specification limit, the lot is accepted if:
+
+$$
+\bar{x} - k\sigma \geq L
+$$
+
+Where:
+
+- $\bar{x}$ = Sample mean.
+- $k$ = Acceptance constant.
+- $\sigma$ = Population standard deviation.
+- $L$ = Lower specification limit.
+
+If the above condition is satisfied, the lot is accepted; otherwise, it is rejected.
+
+#### Operating Characteristic (OC) Curve
+
+The OC curve represents the relationship between the percentage of defective products in a lot and the probability of accepting that lot.
+
+The probability of acceptance is:
+
+$$
+P_a = \Phi\left[
+\sqrt{n}\left(\frac{\mu-L}{\sigma}-k\right)
+\right]
+$$
+
+Where:
+
+- $P_a$ = Probability of acceptance.
+- $n$ = Sample size.
+- $\mu$ = Population mean.
+- $L$ = Lower specification limit.
+- $\sigma$ = Population standard deviation.
+
+- $k$ = Acceptance constant.
+- $\Phi$ = Standard normal cumulative distribution function.
+
+#### Average Outgoing Quality (AOQ)
+
+AOQ represents the average percentage of defective products leaving the inspection process when rejected lots are subjected to 100% inspection and defective items are replaced.
+
+The formula is:
+
+$$
+AOQ = P_a \times p \times \frac{N-n}{N}
+$$
+
+Where:
+
+- $P_a$ = Probability of acceptance.
+- $p$ = Fraction defective.
+- $N$ = Lot size.
+- $n$ = Sample size.
+
+#### Lot Tolerance Percent Defective (LTPD)
+
+LTPD is the percentage of defective products in a lot at which the probability of accepting the lot becomes very small.
+
+In this question:
+
+$$
+LTPD = 8\%
+$$
+
+And the probability of acceptance at LTPD is:
+
+$$
+P_a = 0.07
+$$
+
+This means that a lot containing 8% defective products has only a 7% probability of acceptance.
+
+
+```{r}
+
+
+# Variables Sampling Plan for Yarn Breaking Strength
+
+# Given values
+LSL <- 25
+variance <- 6
+sigma <- sqrt(variance)
+
+AQL <- 0.03
+Pa_AQL <- 0.94
+
+LTPD <- 0.08
+Pa_LTPD <- 0.07
+
+alpha <- 1 - Pa_AQL
+beta <- Pa_LTPD
+
+# Calculating the z-values
+z1 <- qnorm(1 - AQL)
+z2 <- qnorm(1 - LTPD)
+z3 <- qnorm(Pa_AQL)
+z4 <- qnorm(Pa_LTPD)
+
+# Calculating sample size
+n_exact <- ((z3 - z4) / (z1 - z2))^2
+
+# Round sample size to next integer
+n <- ceiling(n_exact)
+
+# Calculate acceptance constants and acceptance limits
+k <- z1 - z3 / sqrt(n)
+
+acceptance_limit <- LSL + k * sigma
+
+# Probability of acceptance function
+Pa_function <- function(p) {
+  z <- qnorm(1 - p)
+  Pa <- pnorm(sqrt(n) * (z - k))
+  return(Pa)
+}
+
+# Probability of acceptance at AQL and LTPD
+Pa_at_AQL <- Pa_function(AQL)
+Pa_at_LTPD <- Pa_function(LTPD)
+
+# Display results
+cat("VARIABLES SAMPLING PLAN\n")
+cat("------------------------------\n")
+cat("Lower Specification Limit =", LSL, "\n")
+cat("Variance =", variance, "\n")
+cat("Standard Deviation =", sigma, "\n")
+cat("Exact Sample Size =", n_exact, "\n")
+cat("Final Sample Size =", n, "\n")
+cat("Acceptance Constant (k) =", k, "\n")
+cat("Acceptance Limit =", acceptance_limit, "g\n")
+cat("Producer's Risk =", alpha, "\n")
+cat("Consumer's Risk =", beta, "\n")
+cat("Probability of Acceptance at AQL =",
+    Pa_at_AQL, "\n")
+cat("Probability of Acceptance at LTPD =",
+    Pa_at_LTPD, "\n")
+```
+
+## 1. OC Curve (Operating Characteristic Curve)
+
+```{r OC-Curve}
+# OC Curve
+
+p <- seq(0.001, 0.20, by = 0.001)
+Pa <- sapply(p, Pa_function)
+
+plot(p * 100, Pa,
+     type = "l",
+     col = "blue",
+     lwd = 2,
+     main = "Operating Characteristic (OC) Curve",
+     xlab = "Percentage Defective",
+     ylab = "Probability of Acceptance",
+     ylim = c(0, 1))
+
+grid()
+
+# Mark AQL
+points(AQL * 100, Pa_at_AQL,
+       col = "green", pch = 19)
+
+# Mark LTPD
+points(LTPD * 100, Pa_at_LTPD,
+       col = "red", pch = 19)
+
+abline(v = AQL * 100, col = "green", lty = 2)
+abline(v = LTPD * 100, col = "red", lty = 2)
+
+legend("topright",
+       legend = c("OC Curve", "AQL", "LTPD"),
+       col = c("blue", "green", "red"),
+       lty = c(1, NA, NA),
+       pch = c(NA, 19, 19),
+       lwd = 2)
+```
+
+## 2. AOQ Curve (Average Outgoing Quality Curve)
+
+```{r AOQ-Curve}
+# Assumed lot size
+N <- 1000
+
+# Calculate AOQ
+AOQ <- Pa * p * (N - n) / N
+
+plot(p * 100, AOQ * 100,
+     type = "l",
+     col = "purple",
+     lwd = 2,
+     main = "Average Outgoing Quality (AOQ) Curve",
+     xlab = "Percentage Defective",
+     ylab = "Average Outgoing Quality (%)",
+     ylim = c(0, max(AOQ) * 100 * 1.1))
+
+grid()
+
+# Calculate AOQL
+AOQL <- max(AOQ) * 100
+
+cat("AOQL =", AOQL, "%\n")
+
+# Mark AOQL
+max_index <- which.max(AOQ)
+
+points(p[max_index] * 100,
+       AOQ[max_index] * 100,
+       col = "red", pch = 19)
+
+text(p[max_index] * 100,
+     AOQ[max_index] * 100,
+     labels = paste("AOQL =", round(AOQL, 3), "%"),
+     pos = 3,
+     col = "red")
+```
+
+## 3. LTPD and Consumer's Risk
+
+```{r LTPD-Curve}
+# LTPD and Consumer's Risk
+
+plot(p * 100, Pa,
+     type = "l",
+     col = "blue",
+     lwd = 2,
+     main = "LTPD and Consumer's Risk",
+     xlab = "Percentage Defective",
+     ylab = "Probability of Acceptance",
+     ylim = c(0, 1))
+
+grid()
+
+# Mark LTPD
+abline(v = LTPD * 100,
+       col = "red", lty = 2)
+
+# Mark Consumer's Risk
+abline(h = Pa_LTPD,
+       col = "darkgreen", lty = 2)
+
+points(LTPD * 100, Pa_at_LTPD,
+       col = "red", pch = 19, cex = 1.5)
+
+text(LTPD * 100, Pa_at_LTPD,
+     labels = paste("LTPD =", LTPD * 100, "%"),
+     pos = 4, col = "red")
+
+legend("topright",
+       legend = c("OC Curve", "LTPD", "Target Acceptance"),
+       col = c("blue", "red", "darkgreen"),
+       lty = c(1, 2, 2),
+       lwd = 2)
+```
+
+
+### Result
+
+The variables sampling plan for yarn breaking strength was successfully determined using the normal distribution.
+
+#### OC Curve
+
+The OC curve shows the probability of accepting a lot against the percentage of defective products.
+
+- At 3% defective (AQL), the probability of acceptance is approximately 94%.
+- At 8% defective (LTPD), the probability of acceptance is approximately 7%.
+- As the percentage of defective products increases, the probability of accepting the lot decreases.
+
+#### AOQ Curve
+
+The AOQ curve represents the average outgoing quality of the inspected lots.
+
+- AOQ initially increases with the percentage defective.
+- It reaches a maximum value called AOQL (Average Outgoing Quality Limit).
+- After reaching AOQL, AOQ decreases because more defective lots are rejected and subjected to rectifying inspection.
+
+#### LTPD
+
+LTPD represents the maximum percentage defective that a consumer is willing to tolerate at a specified probability of acceptance.
+
+In this practical:
+
+$$
+LTPD = 8\%
+$$
+
+$$
+P_a = 7\%
+$$
+
+Thus, a lot containing 8% defective products has approximately a 7% chance of acceptance.
+
+The third graph highlights this LTPD point on the OC curve. LTPD is technically a quality level, rather than a separate statistical curve.
+
+### Conclusion
+
+The variables sampling plan was designed successfully for the breaking strength of yarn. A random sample of 41 specimens is selected from the lot, and the sample mean is compared with the acceptance limit of approximately 29.012 g.
+
+The lot is accepted if the sample mean is greater than or equal to the acceptance limit; otherwise, it is rejected.
+
+The OC and AOQ curves help in understanding the performance of the sampling plan and the quality protection offered to the producer and consumer.

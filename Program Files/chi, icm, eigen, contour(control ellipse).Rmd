@@ -1,0 +1,481 @@
+---
+title: "Practical 5"
+author: "Yash Jaiswal"
+date: '25237765036'
+output: html_document
+---
+
+### Aim
+
+To construct a Chi-Square Control Chart for a multivariate process with three quality characteristics, calculate the UCL, inverse covariance matrix, eigenvalues and eigenvectors, and plot the control chart and control ellipse.
+
+### Practical
+
+We are monitoring a process with p = 3 quality characteristics: temperature x1, pressure x2 and flow rate x3. The process has been established with the following in-control mean vector and variance-covariance matrix:
+
+\[
+\mu =
+\begin{bmatrix}
+50\\
+100\\
+20
+\end{bmatrix},
+\qquad
+\Sigma =
+\begin{bmatrix}
+10 & 20 & 5\\
+20 & 50 & 12\\
+5 & 12 & 8
+\end{bmatrix}
+\]
+
+Now the sample vector observations on x1, x2 and x3 are recorded as:
+
+\[
+\mathbf{x}_2 =
+\begin{bmatrix}
+54\\
+92\\
+16
+\end{bmatrix},
+\qquad
+\mathbf{x}_1 =
+\begin{bmatrix}
+54\\
+108\\
+22
+\end{bmatrix}
+\]
+
+Compute the chi-square test statistic, the UCL, the inverse variance-covariance matrix, the eigenvalues and eigenvectors. Plot a single control chart for both cases and also plot the contour plot (control ellipse).
+
+### Theory
+
+
+
+#### 1. Multivariate Statistical Process Control
+
+Multivariate Statistical Process Control (MSPC) is used to monitor two or more quality characteristics simultaneously. Unlike univariate control charts, which monitor one variable at a time, multivariate control charts consider the joint variation and correlation among all variables.
+
+In this practical, three quality characteristics are represented by the random vector
+
+$$
+\mathbf{X} =
+\begin{pmatrix}
+X_1\\
+X_2\\
+X_3
+\end{pmatrix}.
+$$
+
+The specified mean vector is
+
+$$
+\boldsymbol{\mu} =
+\begin{pmatrix}
+50\\
+100\\
+20
+\end{pmatrix},
+$$
+
+and the covariance matrix is
+
+$$
+\boldsymbol{\Sigma} =
+\begin{pmatrix}
+10 & 20 & 5\\
+20 & 50 & 12\\
+5 & 12 & 8
+\end{pmatrix}.
+$$
+
+The mean vector represents the target values of the quality characteristics, while the covariance matrix describes their variances and covariances.
+
+#### 2. Chi-Square Statistic
+
+The squared Mahalanobis distance measures the deviation of an observed multivariate vector from its specified mean while accounting for the covariance structure among the variables.
+
+For an observation $\mathbf{x}$, the statistic is defined as
+
+$$
+D^2 =
+(\mathbf{x}-\boldsymbol{\mu})^T
+\boldsymbol{\Sigma}^{-1}
+(\mathbf{x}-\boldsymbol{\mu}).
+$$
+
+where:
+
+- $\mathbf{x}$ is the observed vector.
+- $\boldsymbol{\mu}$ is the specified mean vector.
+- $\boldsymbol{\Sigma}^{-1}$ is the inverse of the covariance matrix.
+- $T$ denotes the transpose.
+- $D^2$ is the squared Mahalanobis distance.
+
+Assuming that the observations follow a multivariate normal distribution,
+
+$$
+\mathbf{X}\sim
+N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}),
+$$
+
+with known mean vector and covariance matrix, the squared Mahalanobis distance follows a chi-square distribution with $p$ degrees of freedom:
+
+$$
+D^2\sim\chi_p^2.
+$$
+
+In this practical, $p=3$, because three quality characteristics are monitored.
+
+#### 3. Control Limits
+
+The control limits are determined using the chi-square distribution at a specified significance level $\alpha$.
+
+The Upper Control Limit (UCL) is
+
+$$
+UCL=\chi^2_{p,\,1-\alpha}.
+$$
+
+The Centre Line (CL) is
+
+$$
+CL=p.
+$$
+
+The Lower Control Limit (LCL) is
+
+$$
+LCL=0.
+$$
+
+The centre line is based on the expected value of a chi-square random variable, which is $p$. The lower control limit is zero because the squared Mahalanobis distance cannot be negative.
+
+For this practical,
+
+$$
+p=3,\qquad \alpha=0.0027.
+$$
+
+Therefore,
+
+$$
+UCL=\chi^2_{3,\,0.9973}\approx14.1563,
+$$
+
+$$
+CL=3,\qquad LCL=0.
+$$
+
+The decision rule is:
+
+- If $D^2>UCL$, the observation is classified as out of control.
+- If $D^2\leq UCL$, the observation is classified as in control according to the upper control limit.
+
+#### 4. Chi-Square Control Chart
+
+A chi-square control chart is a graphical tool for monitoring the multivariate behaviour of a process. The calculated $D^2$ statistics are plotted against the sample numbers.
+
+The chart consists of the Upper Control Limit (UCL), Centre Line (CL), and Lower Control Limit (LCL).
+
+An observation exceeding the UCL indicates a statistically unusual deviation from the specified multivariate mean and may suggest that the process is out of control.
+
+In this practical, the statistics are calculated for Case1 and Case2. Each observation is assessed jointly across all three quality characteristics.
+
+#### 5. Confidence Ellipses
+
+Confidence ellipses provide a two-dimensional representation of the joint variation between pairs of quality characteristics. They are constructed using the corresponding $2\times2$ covariance submatrix.
+
+For variables $X_i$ and $X_j$, the covariance submatrix is
+
+$$
+\boldsymbol{\Sigma}_{ij}=
+\begin{pmatrix}
+\sigma_{ii} & \sigma_{ij}\\
+\sigma_{ji} & \sigma_{jj}
+\end{pmatrix}.
+$$
+
+The corresponding mean vector is
+
+$$
+\boldsymbol{\mu}_{ij}=
+\begin{pmatrix}
+\mu_i\\
+\mu_j
+\end{pmatrix}.
+$$
+
+The equation of the ellipse is
+
+$$
+(\mathbf{x}_{ij}-\boldsymbol{\mu}_{ij})^T
+\boldsymbol{\Sigma}_{ij}^{-1}
+(\mathbf{x}_{ij}-\boldsymbol{\mu}_{ij})=c,
+$$
+
+where $c$ is the chosen chi-square threshold.
+
+The eigenvalues and eigenvectors of the covariance submatrix determine the lengths and orientations of the principal axes of the ellipse.
+
+The semi-axis lengths are
+
+$$
+a_k=\sqrt{\lambda_k c},
+\qquad k=1,2,
+$$
+
+where $\lambda_k$ denotes the eigenvalues of the covariance submatrix.
+
+In the given code, $c=UCL$ is used to construct the ellipses. The mean point is marked with a green cross, and the observed sample points are shown in black.
+
+The three pairwise plots are:
+
+1. $X_1$ versus $X_2$.
+2. $X_1$ versus $X_3$.
+3. $X_2$ versus $X_3$.
+
+These plots help visualize the covariance structure and the deviations of observations from the target mean in each two-dimensional projection.
+
+#### 6. Assumptions
+
+The methodology relies on the following assumptions:
+
+1. The quality characteristics follow a multivariate normal distribution.
+2. The specified mean vector and covariance matrix adequately represent the in-control process.
+3. The covariance matrix is symmetric and positive definite, ensuring that its inverse exists.
+4. The observations are obtained under comparable process conditions.
+5. The covariance structure is appropriately considered when evaluating deviations from the target mean.
+
+The chi-square control chart provides a statistical method for identifying unusual multivariate observations. The interpretation of the control limits depends on the validity of the assumptions and on whether the process parameters are known or estimated.
+
+### Code
+
+```{r}
+mu <- c(50, 100, 20)
+
+Sigma <- matrix(c(10, 20, 5,
+                  20, 50, 12,
+                  5, 12, 8), 
+                nrow = 3, byrow = TRUE)
+
+p <- 3
+alpha <- 0.0027
+
+# 2. Sample Observations
+samples <- rbind(
+  Case1 = c(54, 108, 22),
+  Case2 = c(54, 92, 16)
+)
+
+print("Mean Vector:")
+
+print(mu)
+
+print("Covariance Matrix:")
+
+print(Sigma)
+
+print("Sample Observations:")
+
+print(samples)
+
+# 3. Chi-Square Statistic
+
+S_inv <- solve(Sigma)
+
+chi_square <- function(x) {
+  d <- x - mu
+  t(d) %*% S_inv %*% d
+}
+
+chi_values <- apply(samples, 1, chi_square)
+
+print("Chi-Square Statistics:")
+
+print(round(chi_values, 4))
+
+# 4. Control Limits
+UCL <- qchisq(1 - alpha, df = p)
+CL <- p
+LCL <- 0
+
+cat("UCL =", round(UCL, 4), "\n")
+
+cat("CL  =", CL, "\n")
+
+cat("LCL =", LCL, "\n")
+
+# 5. Verdict
+verdict <- ifelse(chi_values > UCL,
+                  "OUT OF CONTROL",
+                  "IN CONTROL")
+
+summary <- data.frame(
+  Sample = rownames(samples),
+  Chi_Square = round(chi_values, 4),
+  UCL = round(UCL, 4),
+  Verdict = verdict
+)
+
+print(summary)
+
+# 6. CHI-SQUARE CONTROL CHART
+
+plot(chi_values, type = "o", pch = 19,
+     col = "blue",
+     ylim = c(0, 30),
+     xaxt = "n",
+     xlab = "Sample",
+     ylab = expression(chi[0]^2),
+     main = "Chi-Square Control Chart")
+
+axis(1, at = 1:2, labels = rownames(samples))
+
+abline(h = UCL, col = "red", lty = 2, lwd = 2)
+abline(h = CL, col = "darkgreen", lty = 3)
+abline(h = LCL, col = "grey40", lty = 3)
+
+legend("topleft",
+       legend = c("Chi-Square", "UCL", "CL", "LCL"),
+       col = c("blue", "red", "darkgreen", "grey40"),
+       lty = c(1, 2, 3, 3),
+       pch = c(19, NA, NA, NA),
+       bty = "n")
+# 7. CONFIDENCE ELLIPSES
+
+draw_ellipse <- function(i, j) {
+  
+  # Select two variables
+  S <- Sigma[c(i, j), c(i, j)]
+  center <- mu[c(i, j)]
+  
+  # Eigenvalues and eigenvectors
+  e <- eigen(S)
+  
+  # Semi-axis lengths
+  axes <- sqrt(e$values * UCL)
+  
+  # Points on ellipse
+  theta <- seq(0, 2*pi, length.out = 200)
+  
+  circle <- rbind(
+    axes[1] * cos(theta),
+    axes[2] * sin(theta)
+  )
+  
+  ellipse <- e$vectors %*% circle
+  
+  x <- center[1] + ellipse[1, ]
+  y <- center[2] + ellipse[2, ]
+  
+  # Plot
+  plot(x, y, type = "l", col = "blue", lwd = 2,
+       xlab = paste0("X", i),
+       ylab = paste0("X", j),
+       main = paste("Ellipse: X", i, "vs X", j),
+       asp = 1)
+  
+  # Mean point
+  points(center[1], center[2],
+         pch = 3, col = "darkgreen", cex = 1.5)
+  
+  # Sample points
+  points(samples[, i], samples[, j],
+         pch = 19, col = "black")
+  
+  text(samples[, i], samples[, j],
+       labels = rownames(samples),
+       pos = 3)
+}
+
+
+# Draw all three ellipses
+par(mfrow = c(1, 3))
+
+draw_ellipse(1, 2)
+draw_ellipse(1, 3)
+draw_ellipse(2, 3)
+```
+
+## Results and Interpretation
+
+### 1. Mean Vector and Covariance Matrix
+
+The specified mean vector is
+
+$$
+\boldsymbol{\mu} =
+\begin{pmatrix}
+50\\
+100\\
+20
+\end{pmatrix}.
+$$
+
+The covariance matrix is
+
+$$
+\boldsymbol{\Sigma} =
+\begin{pmatrix}
+10 & 20 & 5\\
+20 & 50 & 12\\
+5 & 12 & 8
+\end{pmatrix}.
+$$
+
+The mean vector represents the target values of the three quality characteristics. The covariance matrix describes the variances and covariances among these characteristics and is used to calculate the squared Mahalanobis distance.
+
+### 2. Chi-Square Statistics
+
+
+- **Case1:** The chi-square statistic is 1.6000, indicating a relatively small multivariate deviation from the specified mean vector.
+- **Case2:** The chi-square statistic is 28.7373, indicating a substantially larger multivariate deviation from the specified mean vector.
+
+### 3. Control Limits
+
+The control limits are calculated using the chi-square distribution with 3 degrees of freedom and a significance level of 0.0027.
+
+$$
+UCL=\chi^2_{3,\,0.9973}=14.1563
+$$
+
+$$
+CL=3,\qquad LCL=0.
+$$
+
+**Interpretation:**
+
+The UCL is the threshold used to identify observations with unusually large multivariate deviations. Any observation exceeding 14.1563 is classified as out of control according to the specified decision rule.
+
+### 4. Verdict of the Observations
+
+- **Case1:** Since $1.6000 < 14.1563$, the observation lies below the upper control limit and is classified as in control.
+- **Case2:** Since $28.7373 > 14.1563$, the observation exceeds the upper control limit and is classified as out of control.
+
+Therefore, Case2 shows a statistically unusual multivariate deviation from the specified mean vector and should be investigated for possible changes in the process.
+
+### 5. Interpretation of the Chi-Square Control Chart
+
+The chi-square control chart displays the calculated statistics for Case1 and Case2 along with the UCL, CL, and LCL.
+
+Case1 lies below the UCL, indicating that it satisfies the specified control criterion. Case2 lies above the UCL, indicating a potential departure from the in-control process.
+
+The chart demonstrates how a multivariate control chart can identify unusual observations by considering all three quality characteristics simultaneously.
+
+### 6. Interpretation of Confidence Ellipses
+
+Three confidence-ellipse plots are generated for the variable pairs:
+
+1. $X_1$ versus $X_2$.
+2. $X_1$ versus $X_3$.
+3. $X_2$ versus $X_3$.
+
+The ellipses represent contours of equal squared Mahalanobis distance around the corresponding two-dimensional mean vectors.
+
+The orientation and shape of each ellipse reflect the variances and covariance of the selected pair of variables. The plotted sample points show the observed values relative to these contours.
+
+Case1 has coordinates $(54,108,22)$, whereas Case2 has coordinates $(54,92,16)$. Although both observations have the same value of $X_1$, they differ in $X_2$ and $X_3$. These differences contribute to their different multivariate distances.
+
+The pairwise plots help identify which combinations of variables contribute to unusual observations. However, a point's position in a two-dimensional ellipse does not necessarily determine its classification under the full three-dimensional control chart.

@@ -1,0 +1,327 @@
+---
+title: "Practical 11"
+author: "Yash Jaiswal"
+date: "2026-11-25"
+output: html_document
+---
+
+
+
+# Aim
+
+To assess the capability of a dairy-processing step from subgroup averages and ranges by estimating the indices Cp, Cpk, Cpm and Cpmk against a target of 23 mg, finding 95% confidence intervals for Cp and Cpk, and testing whether Cp is less than 0.6 at the 5% level of significance.
+
+# Problem Statement
+
+The amount of preservative added to a dairy product should not exceed certain levels, 23 ± 6 mg. Samples of size 5 of processed cheese were taken from the process, and the average level of preservative and the range of each sample are given below.
+
+| Sample | Average | Range | Sample | Average | Range |
+|:------:|:-------:|:-----:|:------:|:-------:|:-----:|
+| 1 | 22 | 5 | 14 | 22 | 7 |
+| 2 | 26 | 4 | 15 | 20 | 5 |
+| 3 | 26 | 6 | 16 | 24 | 8 |
+| 4 | 24 | 7 | 17 | 25 | 6 |
+| 5 | 22 | 3 | 18 | 23 | 8 |
+| 6 | 21 | 5 | 19 | 20 | 5 |
+| 7 | 29 | 7 | 20 | 22 | 4 |
+| 8 | 25 | 8 | 21 | 22 | 6 |
+| 9 | 22 | 4 | 22 | 23 | 7 |
+| 10 | 25 | 6 | 23 | 24 | 5 |
+| 11 | 25 | 9 | 24 | 22 | 6 |
+| 12 | 22 | 3 | 25 | 25 | 5 |
+| 13 | 21 | 5 | | | |
+
+The following are to be determined:
+
+(a) Assuming normality and a target value of 23 mg, determine the indices Cp, Cpk, Cpm and Cpmk.
+
+(b) Find a 95% confidence interval for Cp and Cpk, assuming normality.
+
+(c) Test whether Cp is less than 0.6 at the 5% level of significance.
+
+# Theory
+
+The specification 23 ± 6 mg gives the lower specification limit (LSL) = 17, upper specification limit (USL) = 29 and target value (T) = 23. Therefore, the specification width is 12 mg.
+
+There are 25 subgroups, each containing 5 observations. The process mean is estimated using the grand mean of the sample averages, while the process standard deviation is estimated using the average range and the control-chart constant d2 = 2.326 for n = 5.
+
+The estimators are:
+
+$$
+\hat{\mu}=\bar{\bar{x}}=
+\frac{1}{m}\sum_{j=1}^{m}\bar{x}_j
+$$
+
+$$
+\hat{\sigma}=\frac{\bar{R}}{d_2}
+$$
+
+**Process Capability Indices**
+
+The potential capability of a process is measured by Cp, which compares the specification width with the natural process spread.
+
+$$
+C_p=\frac{USL-LSL}{6\hat{\sigma}}
+$$
+
+The indices Cpu and Cpl measure the capability with respect to the upper and lower specification limits, respectively.
+
+$$
+C_{pu}=\frac{USL-\hat{\mu}}{3\hat{\sigma}}
+$$
+
+$$
+C_{pl}=\frac{\hat{\mu}-LSL}{3\hat{\sigma}}
+$$
+
+The actual process capability index is:
+
+$$
+C_{pk}=\min(C_{pu},C_{pl})
+$$
+
+Cpm and Cpmk also consider the deviation of the process mean from the target value. They are defined as:
+
+$$
+C_{pm}=
+\frac{C_p}
+{\sqrt{1+\left(\frac{\hat{\mu}-T}{\hat{\sigma}}\right)^2}}
+$$
+
+$$
+C_{pmk}=
+\frac{C_{pk}}
+{\sqrt{1+\left(\frac{\hat{\mu}-T}{\hat{\sigma}}\right)^2}}
+$$
+
+**Confidence Intervals**
+
+For a normal process, let N = mn be the total number of observations. The 95% confidence interval for Cp is:
+
+$$
+\hat{C}_p
+\sqrt{\frac{\chi^2_{\alpha/2,N-1}}{N-1}}
+\leq C_p \leq
+\hat{C}_p
+\sqrt{\frac{\chi^2_{1-\alpha/2,N-1}}{N-1}}
+$$
+
+An approximate confidence interval for Cpk is:
+
+$$
+\hat{C}_{pk}\pm z_{\alpha/2}
+\sqrt{
+\frac{1}{9N}+
+\frac{\hat{C}_{pk}^{2}}{2(N-1)}
+}
+$$
+
+**Hypothesis Testing**
+
+To test whether Cp is less than 0.6, the hypotheses are:
+
+$$
+H_0:C_p=0.6
+$$
+
+$$
+H_1:C_p<0.6
+$$
+
+The critical value is:
+
+$$
+C_p^*=C_{p0}
+\sqrt{\frac{\chi^2_{\alpha,N-1}}{N-1}}
+$$
+
+where Cp0 = 0.6.
+
+The null hypothesis is rejected if the estimated Cp is less than the critical value.
+
+The R functions used include `mean()` for calculating averages, `min()` for finding the smaller capability index, `qchisq()` and `qnorm()` for obtaining distribution quantiles, `pchisq()` for calculating the p-value, and `data.frame()` for presenting the results.
+
+# R Code
+
+```{r}
+# Data: 25 subgroups of size n = 5
+
+avg <- c(22, 26, 26, 24, 22, 21, 29, 25, 22, 25,
+         25, 22, 21, 22, 20, 24, 25, 23, 20, 22,
+         22, 23, 24, 22, 25)
+
+rng <- c(5, 4, 6, 7, 3, 5, 7, 8, 4, 6,
+         9, 3, 5, 7, 5, 8, 6, 8, 5, 4,
+         6, 7, 5, 6, 5)
+
+n <- 5
+m <- length(avg)
+N <- n * m
+d2 <- 2.326
+alpha <- 0.05
+```
+
+**Specification Limits**
+
+```{r}
+# Specification: 23 +/- 6 mg
+
+Target <- 23
+LSL <- Target - 6
+USL <- Target + 6
+
+c(LSL = LSL, Target = Target, USL = USL)
+```
+
+**Estimation of Process Mean and Standard Deviation**
+
+```{r}
+xbarbar <- mean(avg)
+Rbar <- mean(rng)
+
+sigma <- Rbar / d2
+
+round(c(xbarbar = xbarbar,
+        Rbar = Rbar,
+        sigma = sigma), 4)
+```
+
+**(a) Calculation of Process Capability Indices**
+
+```{r}
+Cp <- (USL - LSL) / (6 * sigma)
+
+Cpu <- (USL - xbarbar) / (3 * sigma)
+
+Cpl <- (xbarbar - LSL) / (3 * sigma)
+
+Cpk <- min(Cpu, Cpl)
+
+tau <- sqrt(1 + ((xbarbar - Target) / sigma)^2)
+
+Cpm <- Cp / tau
+
+Cpmk <- Cpk / tau
+
+round(c(Cp = Cp, Cpu = Cpu, Cpl = Cpl,
+        Cpk = Cpk, Cpm = Cpm, Cpmk = Cpmk), 4)
+```
+
+**(b) 95% Confidence Intervals for Cp and Cpk**
+
+```{r}
+# Confidence interval for Cp
+
+Cp_L <- Cp * sqrt(qchisq(alpha / 2, N - 1) / (N - 1))
+
+Cp_U <- Cp * sqrt(qchisq(1 - alpha / 2, N - 1) / (N - 1))
+
+# Confidence interval for Cpk
+
+z <- qnorm(1 - alpha / 2)
+
+se_Cpk <- sqrt(1 / (9 * N) + Cpk^2 / (2 * (N - 1)))
+
+Cpk_L <- Cpk - z * se_Cpk
+
+Cpk_U <- Cpk + z * se_Cpk
+
+# Display confidence intervals
+
+data.frame(
+  Index = c("Cp", "Cpk"),
+  Estimate = round(c(Cp, Cpk), 4),
+  Lower = round(c(Cp_L, Cpk_L), 4),
+  Upper = round(c(Cp_U, Cpk_U), 4)
+)
+```
+
+**(c) Hypothesis Testing for Cp < 0.6**
+
+```{r}
+# Hypothesis testing
+
+Cp0 <- 0.6
+
+crit <- Cp0 * sqrt(qchisq(alpha, N - 1) / (N - 1))
+
+chi_stat <- (N - 1) * (Cp / Cp0)^2
+
+p_val <- pchisq(chi_stat, N - 1)
+
+round(c(Cp_hat = Cp,
+        Critical = crit,
+        Chi_sq = chi_stat,
+        p_value = p_val), 4)
+
+if (Cp < crit) {
+  "Reject H0"
+} else {
+  "Fail to reject H0"
+}
+```
+
+# Results and Interpretation
+
+The calculated grand mean is 23.28 mg, and the average range is 5.76 mg. The estimated process standard deviation is 2.4764 mg.
+
+The specification limits are:
+
+- LSL = 17 mg
+- Target = 23 mg
+- USL = 29 mg
+
+**Process Capability Indices**
+
+The estimated capability indices are:
+
+| Index | Value |
+|:-----:|:-----:|
+| Cp | 0.8076 |
+| Cpu | 0.7699 |
+| Cpl | 0.8453 |
+| Cpk | 0.7699 |
+| Cpm | 0.8025 |
+| Cpmk | 0.7651 |
+
+All the capability indices are below 1, indicating that the process is not capable of consistently meeting the specified requirements. The value of Cpk is lower than Cp because the process mean is slightly above the target value.
+
+**95% Confidence Intervals**
+
+The confidence intervals obtained are:
+
+| Index | Estimate | Lower Limit | Upper Limit |
+|:-----:|:--------:|:-----------:|:-----------:|
+| Cp | 0.8076 | 0.7072 | 0.9079 |
+| Cpk | 0.7699 | 0.6577 | 0.8822 |
+
+Both confidence intervals lie entirely below 1, indicating insufficient process capability.
+
+**Hypothesis Testing**
+
+The hypotheses are:
+
+$$
+H_0:C_p=0.6
+$$
+
+$$
+H_1:C_p<0.6
+$$
+
+The calculated critical value is 0.5369, while the estimated Cp is 0.8076. The p-value is approximately 1.
+
+Since the estimated Cp is greater than the critical value and the p-value is greater than 0.05, we fail to reject the null hypothesis.
+
+Therefore, there is insufficient evidence to conclude that Cp is less than 0.6 at the 5% level of significance.
+
+# Conclusion
+
+The process capability analysis indicates that the estimated capability indices Cp, Cpk, Cpm and Cpmk are 0.8076, 0.7699, 0.8025 and 0.7651, respectively.
+
+Since all the indices are below 1, the process is not capable of consistently meeting the specified requirements. The 95% confidence intervals for Cp and Cpk also indicate insufficient process capability.
+
+Furthermore, the hypothesis test shows that there is insufficient evidence to conclude that Cp is less than 0.6 at the 5% level of significance. Hence, the process variation needs to be reduced to improve its capability.
+```
+
+**Important note:** The confidence interval for \(C_{pk}\) is an approximate normal-based interval, as specified in your theory. Also, the chi-square confidence interval and hypothesis test for \(C_p\) use \(N=125\) independent observations; their validity depends on the underlying sampling and variance-estimation assumptions.

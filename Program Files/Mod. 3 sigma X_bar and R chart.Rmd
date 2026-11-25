@@ -1,0 +1,391 @@
+---
+title: "Practical 2"
+author: "Deepak Kumar Bharti"
+date: '25056765013'
+output: html_document
+---
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### **Aim :**
+To construct and analyze the modified 3-sigma $\bar{X}$ and $R$ control charts for monitoring the nitrogen content of a fertilizer mixture, and to determine whether the process is statistically in control.
+
+#### **Problem :**
+The nitrogen content of a certain fertilizer mix is a characteristic of interest. A random sample of size 5 was selected, and the percentage of nitrogen content was found for each. The sample mean $\bar{X}$ and range $R$ are given below for 20 samples. The specification limits allow values from 12% to 33%. A process non-conformance rate of more than 1% is unacceptable. Construct the 3-sigma modified control limits with a Type-I error rate $\alpha=0.0026$, and then construct range chart modified control chart.
+
+| Sample | $\bar{X}$   | Range |
+|:------:|----:|------:|
+| 1  | 14.8 | 2.2 |
+| 2  | 15.2 | 1.6 |
+| 3  | 16.7 | 1.8 |
+| 4  | 15.5 | 2.0 |
+| 5  | 18.4 | 1.8 |
+| 6  | 17.6 | 1.9 |
+| 7  | 21.4 | 2.2 |
+| 8  | 20.5 | 2.3 |
+| 9  | 22.8 | 2.5 |
+| 10 | 16.9 | 1.8 |
+| 11 | 25.0 | 2.1 |
+| 12 | 16.4 | 1.8 |
+| 13 | 18.6 | 1.5 |
+| 14 | 23.9 | 2.3 |
+| 15 | 17.2 | 2.1 |
+| 16 | 16.8 | 1.6 |
+| 17 | 21.1 | 2.0 |
+| 18 | 19.5 | 2.2 |
+| 19 | 18.3 | 1.8 |
+| 20 | 20.2 | 2.3 |
+
+#### **Theory :**
+
+##### **<u>Statistical Process Control (SPC)</u>**
+**Statistical Process Control (SPC)** is a statistical technique used to monitor and control the quality of a process. It helps determine whether the variation in a process is due to **random (common) causes or assignable causes**.
+
+A **control chart** is a graphical representation of process measurements over time. It generally consists of :
+  
+- **Center Line (CL) :** represents the average level of the process.
+- **Upper Control Limit (UCL) :** upper boundary of expected process variation.
+- **Lower Control Limit (LCL) :** lower boundary of expected process variation.
+
+If observations fall outside the control limits, or show an unusual pattern, the process may be considered out of statistical control.
+
+- ##### **$\bar{X} - R$ Control Chart**
+  When the quality characteristic is a continuous measurement, samples are collected in subgroups of size $n$. For each subgroup, the sample mean $\bar{X}$ and sample range $R$ are calculated.
+
+  The $\bar{X}$-R chart consists of two charts :
+    
+  - **$R$ - chart :** monitors process variability.
+  - **$\bar{X}$ - chart :** monitors changes in the process mean.
+
+  The R-chart is considered first because the process standard deviation is estimated from the average range.
+
+- ##### **Sample Mean**
+  For a sample containing $n$ observations, the sample mean is :
+$$
+\bar{X_i} = \frac{1}{n} \sum_{j=1}^{n} X_{ij}
+$$
+  For $k$ samples, the average of all sample means is called the grand mean :
+$$
+\bar{\bar{X}} = \frac{1}{k} \sum_{i=1}^{k} \bar{X_i}
+$$
+
+- ##### **Sample Range**
+  The range of each subgroup is
+$$
+R_i = X_{max} - X_{min}
+$$
+  The average range is
+$$
+\bar{R} = \frac{1}{k} \sum_{i=1}^{k} R_i
+$$
+
+- ##### **R - Chart**
+  The R-chart is used to monitor the variability or dispersion of the process.
+  
+  The control limits are
+$$
+UCL_R = D_4 \bar{R}
+$$
+$$
+CL_R = \bar{R}
+$$
+$$
+LCL_R = D_3 \bar{R}
+$$
+  where $D_3$ and $D_4$ are control-chart constants depending on the subgroup size.
+  
+  For $n=5$,
+$$
+D_3 = 0, \qquad D_4 = 2.114
+$$
+
+- ##### **Modified Control Chart**
+  The ordinary control chart is generally constructed using fixed $3\sigma$ limits. However, in this practical, the control limits are **modified according to the specification limits and allowable nonconformance rate**.
+  
+  The specification limits are : $(Given)$
+  
+  - Lower Specification Limit **( LSL ) = 12% = 12**
+  - Upper Specification Limit **( USL ) = 33% = 33**
+  
+  The maximum allowable nonconformance rate is :
+$$
+\delta = 0.01, \qquad \text{(i.e. 1%)}
+$$
+  and the Type-I error rate is
+$$
+\alpha = 0.0026
+$$
+  The process is assumed to follow a normal distribution :
+$$
+X \sim N(\mu, \sigma^2)
+$$
+  The allowable limits for the process are obtained as :
+$$
+\mu_U = USL - z_{\delta} \sigma
+$$
+  and
+$$
+\mu_L = LSL + z_{\delta} \sigma
+$$
+  For a sample of size $n$, the sample mean follows
+$$
+\bar{X} \sim N \left( \mu,\frac{\sigma^2}{n} \right)
+$$
+  Therefore, the standard deviation of the sample mean is
+$$
+\sigma_{\bar{X}} = \frac{\sigma}{\sqrt{n}}
+$$
+  For a Type-I error rate $\alpha = 0.0026$, the control limits are
+$$
+UCL = \mu_U + \frac{z_{\alpha}\sigma}{\sqrt{n}}
+$$
+  and
+$$
+LCL = \mu_L - \frac{z_{\alpha}\sigma}{\sqrt{n}}
+$$
+
+- ##### **Estimation of Process Standard Deviation ($\sigma$)**
+  The process standard deviation $\sigma$ is estimated using the average range :
+$$
+\hat\sigma = \frac{\bar{R}}{d_2}
+$$
+  where $d_2$ depends on the subgroup size.
+
+  For $n=5$,
+$$
+d_2 = 2.326
+$$
+  Therefore, the modified control limits are :
+$$
+UCL = USL - \left(z_{\delta} - \frac{z_{\alpha}}{\sqrt{n}}\right)\hat\sigma
+$$
+  and
+$$
+LCL = LSL + \left(z_{\delta} - \frac{z_{\alpha}}{\sqrt{n}}\right)\hat\sigma
+$$
+  and the Center Line ( CL ) is :
+$$
+CL = \bar{\bar{X}}
+$$
+  For $\alpha = 0.0026$, the chart is approximately a $3\sigma$ control chart.
+
+#### **Code and Calculation :**
+
+```{r}
+# Given sample data
+sample <- 1:20
+
+xbar <- c(
+  14.8, 15.2, 16.7, 15.5, 18.4,
+  17.6, 21.4, 20.5, 22.8, 16.9,
+  25.0, 16.4, 18.6, 23.9, 17.2,
+  16.8, 21.1, 19.5, 18.3, 20.2
+)
+
+R <- c(
+  2.2, 1.6, 1.8, 2.0, 1.8,
+  1.9, 2.2, 2.3, 2.5, 1.8,
+  2.1, 1.8, 1.5, 2.3, 2.1,
+  1.6, 2.0, 2.2, 1.8, 2.3
+)
+
+data <- data.frame(
+  Sample = sample,
+  X_bar = xbar,
+  Range = R
+)
+
+data
+
+# Given
+n <- 5      # Sample size
+k <- 20     # total number of samples
+
+# Specification limits
+LSL <- 12
+USL <- 33
+
+delta <- 0.01     # maximum allowable nonconformance rate
+alpha <- 0.0026   # Type-I error rate
+
+# Claculating Average of X_bar & R
+x_barbar <- mean(xbar)
+R_bar <- mean(R)
+cat("The average of all sample means (i.e. X-double_bar) is :", x_barbar)
+cat("The average each sample's range (i.e. R-bar) is :", R_bar)
+
+# R-chart constants for n = 5
+d2 <- 2.326
+D3 <- 0
+D4 <- 2.114
+
+# Estimating Process Standard Deviation
+sigma_hat <- R_bar / d2
+cat("The estimated value of sigma i.e., Process Standard Deviation is :", sigma_hat)
+
+# Constructing R-Chart
+UCL_R <- D4 * R_bar
+CL_R <- R_bar
+LCL_R <- D3 * R_bar
+
+cat("The Upper Control Limit (UCL) for R is :", UCL_R)
+cat("The Center Line (CL) for R is :", CL_R)
+cat("The Lower Control Limit (LCL) for R is :", LCL_R)
+
+# Checking R-chart
+R_out <- which(R > UCL_R | R < LCL_R)
+
+if(length(R_out) == 0) {
+  print("All ranges are within the control limits.")
+} else {
+  print(paste("Out-of-control samples:",
+              paste(R_out, collapse = ", ")))
+}
+
+# Manually ploting R Control Chart
+plot(sample, R,
+     type = "o",
+     pch = 19,
+     col = "black",
+     lwd = 1,
+     xlab = "Sample Number",
+     ylab = "Range (R)",
+     main = "R Control Chart",
+     ylim = c(0, max(UCL_R, R) + 0.5))
+
+# Control Lines
+abline(h = UCL_R, col = "red", lty = 2, lwd = 2)
+abline(h = CL_R,  col = "blue", lty = 1, lwd = 2)
+abline(h = LCL_R, col = "red", lty = 2, lwd = 2)
+
+# Adding Labels
+text(10, UCL_R, paste("UCL =", round(UCL_R, 3)), col = "red", pos = 3)
+text(4, CL_R, paste("CL =", round(CL_R, 3)), col = "blue", pos = 3)
+text(15, LCL_R, paste("LCL =", round(LCL_R, 3)), col = "red", pos = 3)
+
+# Modified X_bar COntrol Chart
+
+z_delta <- qnorm(1 - delta)
+z_alpha <- qnorm(1 - alpha/2)
+
+z_delta
+z_alpha
+
+# Modified factor
+modified_factor <- z_delta - z_alpha / sqrt(n)
+
+modified_factor
+
+# Modified control limits
+UCL_modified <- USL - modified_factor * sigma_hat
+LCL_modified <- LSL + modified_factor * sigma_hat
+CL_modified <- x_barbar
+
+cat("The modified Upper Control Limit (UCL) for X-bar is :", UCL_modified)
+cat("The modified Center Line (CL) for X-bar is :", CL_modified)
+cat("The modified Lower Control Limit (LCL) for X-bar is :", LCL_modified)
+
+# Checking Modified X-bar Chart
+xbar_out <- which(
+  xbar > UCL_modified |
+  xbar < LCL_modified
+)
+
+if(length(xbar_out) == 0) {
+  print("All sample means are within the modified control limits.")
+} else {
+  print(paste(
+    "Out-of-control samples:",
+    paste(xbar_out, collapse = ", ")
+  ))
+}
+
+# Manually Ploting Modified X-bar Chart
+plot(
+  sample, xbar,
+  type = "o",
+  pch = 19,
+  xlab = "Sample Number",
+  ylab = "Sample Mean",
+  main = "Modified 3-Sigma Xbar Chart",
+  ylim = c(
+    min(LCL_modified, xbar) - 1,
+    max(UCL_modified, xbar) + 1
+  )
+)
+
+# Control Lines
+abline(h = UCL_modified, col = "red", lty = 2, lwd = 2)
+abline(h = CL_modified,  col = "blue", lty = 1, lwd = 2)
+abline(h = LCL_modified, col = "red", lty = 2, lwd = 2)
+
+# Adding Labels
+text(10, UCL_modified, paste("UCL =", round(UCL_modified, 3)), col = "red", pos = 3)
+text(4, CL_modified, paste("CL =", round(CL_modified, 3)), col = "blue", pos = 3)
+text(15, LCL_modified, paste("LCL =", round(LCL_modified, 3)), col = "red", pos = 3)
+
+# Installing the required libraries
+# install.packages("qcc")
+library(qcc)
+
+# Ploting modified X_bar Chart Using the package QCC
+xbar_chart <- qcc(
+  xbar,
+  type = "xbar.one",
+  center = CL_modified,
+  limits = c(LCL_modified, UCL_modified),
+  title = "Modified X-bar Chart using in-built package QCC"
+)
+```
+
+#### **Results :**
+
+```{r results, echo = FALSE}
+results <- data.frame(
+  Parameter = c(
+    "Sample size",
+    "Number of samples",
+    "Grand mean",
+    "Average range",
+    "Estimated sigma",
+    "R-chart UCL",
+    "R-chart CL",
+    "R-chart LCL",
+    "Modified X_bar UCL",
+    "Modified X_bar CL",
+    "Modified X_bar LCL"
+  ),
+
+  Value = c(
+    n,
+    k,
+    x_barbar,
+    R_bar,
+    sigma_hat,
+    UCL_R,
+    CL_R,
+    LCL_R,
+    UCL_modified,
+    CL_modified,
+    LCL_modified
+  )
+)
+
+results
+cat("All the points lies inside the control limits in both charts.\nTherefore, the process are under statistical control.")
+```
+
+#### **Conclusions :**
+
+- The **R-chart** was first constructed to examine the **variability** of the fertilizer nitrogen-content process.
+  
+  Since all 20 sample ranges lie within these limits, the process variability is considered to be **in statistical control**.
+  
+- Using the specified allowable nonconformance rate $\delta=0.01$ and Type-I error rate $\alpha=0.0026$, we have constructed the modified X_bar control chart.
+  
+  All 20 sample means lie within these modified control limits. Therefore, **there is no out-of-control signal in the modified $\bar X$-chart**.
+  
+- Hence, based on both the **R-chart and modified $\bar X$-chart**, the fertilizer nitrogen-content process appears to be **statistically stable and satisfactory with respect to the specified nitrogen-content limits of 12% to 33%**.

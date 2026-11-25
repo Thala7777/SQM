@@ -1,0 +1,461 @@
+---
+title: "Practical 3"
+author: "Sudhanshu Ranjan"
+date: '25056765011'
+output: html_document
+---
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### **Aim :**
+To construct and interpret an **Acceptance Control Chart** for the sample mean and an R-chart for the range of nitrogen content in fertilizer samples using R software, and to determine whether the process is statistically in control and meets the specified quality requirements.
+
+#### **Problem :**
+
+The nitrogen content of a certain fertilizer mix is a characteristic of interest. A random sample of size 5 was selected, and the percentage of nitrogen content was found for each. The sample mean $\bar{X}$ and range $R$ are given below for 20 samples. The specification limits allow values from 12% to 33%. A process non-conformance rate of more than 1% is unacceptable. Suppose that proportion of Non-Conforming is 3% (i.e. $\gamma = 0.03$) and we want to detect an out of control condition with probability $0.95$ (i.e. $1 - \beta = 0.95$). Construct the Acceptable Control Chart and also construct Range Chart also.
+
+| Sample | $\bar{X}$   | Range |
+|:------:|----:|------:|
+| 1  | 14.8 | 2.2 |
+| 2  | 15.2 | 1.6 |
+| 3  | 16.7 | 1.8 |
+| 4  | 15.5 | 2.0 |
+| 5  | 18.4 | 1.8 |
+| 6  | 17.6 | 1.9 |
+| 7  | 21.4 | 2.2 |
+| 8  | 20.5 | 2.3 |
+| 9  | 22.8 | 2.5 |
+| 10 | 16.9 | 1.8 |
+| 11 | 25.0 | 2.1 |
+| 12 | 16.4 | 1.8 |
+| 13 | 18.6 | 1.5 |
+| 14 | 23.9 | 2.3 |
+| 15 | 17.2 | 2.1 |
+| 16 | 16.8 | 1.6 |
+| 17 | 21.1 | 2.0 |
+| 18 | 19.5 | 2.2 |
+| 19 | 18.3 | 1.8 |
+| 20 | 20.2 | 2.3 |
+
+#### **Theory :**
+
+A **control chart** is a statistical quality-control tool used to determine whether a manufacturing process is operating under **statistical control**. It distinguishes between :
+
+- **Common causes :** natural/random variation inherent in the process.
+- **Assignable causes :** unusual sources of variation that indicate the process may be out of control.
+
+In this practical, the **nitrogen content of fertilizer** is the quality characteristic of interest. Samples of size $n=5$ are taken from the process, and the sample mean $\bar X$ and sample range $R$ are calculated for each sample.
+
+Two charts are constructed :
+  
+1. **R-chart** — checks whether the process variability is statistically stable.
+
+   It will be **constructed first** because the estimate of process variation depends on $\bar R$.
+   
+2. **Acceptance Control Chart for $\bar X$** — checks whether the process mean is acceptable with respect to the specification limits.
+
+- ##### **R - Chart**
+  The **R-chart (Range chart)** is used to monitor the **process variability**.
+  
+  For each sample,
+$$
+R_i = X_{max} - X_{min}
+$$
+  The average range is
+$$
+\bar{R} = \frac{1}{k} \sum_{i=1}^{k} R_i
+$$
+  where $k$ is the number of sampls.
+  
+  The Center Line (CL) of the R-chart is :
+$$
+CL_R = \bar R
+$$
+  The control limits are :
+$$
+UCL_R = D_4 \bar{R}
+$$
+$$
+CL_R = \bar{R}
+$$
+$$
+LCL_R = D_3 \bar{R}
+$$
+  where $D_3$ and $D_4$ are control-chart constants depending on the subgroup size.
+  
+  For $n=5$,
+$$
+D_3 = 0, \qquad D_4 = 2.114
+$$
+  If all points lie between the control limits and there are no unusual patterns, the process variability is considered statistically controlled.
+  
+  A point outside the R-chart limits indicates that the process variation may have changed because of an assignable cause.
+  
+- ##### **Acceptance Control Chart**
+  An **Acceptance Control Chart (ACC)** is a statistical quality control chart used to determine whether a process is operating at an acceptable level when specification limits and an allowable proportion of non-conforming products are specified.
+  
+  An **Acceptance Control Chart** is used when the objective is not simply to detect changes in the process mean, but to determine whether the process is capable of meeting specified requirements.
+  
+  The purpose of an acceptance control chart is to determine modified control limits such that the process can detect a specified proportion of non-conforming items with a desired probability.
+  
+  The process has specification limits :
+$$
+\text{Lower Specification Limit} = LSL = 12\% = 12 \qquad (Given)
+$$
+$$
+\text{Upper Specification Limit} = USL = 33\% = 33 \qquad (Given)
+$$
+  The acceptable proportion of nonconforming product is specified as :
+$$
+\gamma = 0.03
+$$
+  Thus, the process is considered unacceptable if more than 3% of its output is nonconforming.
+  
+  The desired probability of detecting an out-of-control condition is :
+$$
+1 - \beta = 0.95
+$$
+  so,
+$$
+\beta = 0.05
+$$
+
+- ##### **Estimation of Process Parameters**
+  Since the population standard deviation is unknown, it is estimated using the average range.
+  
+  For samples of size $n$,
+$$
+\hat\sigma = \frac{\bar{R}}{d_2}
+$$
+  where :
+    
+  - $\hat\sigma$ : estimated process standard deviation
+  - $\bar{R}$ : average sample range
+  - $d_2$ : control-chart constant depending on sample size.
+    
+    For $n=5$,
+$$
+d_2 = 2.326
+$$
+
+- ##### **Acceptance Limits**
+  The acceptance limits for the sample mean are obtained from the specification limits, the allowable fraction nonconforming, and the desired detection probability.
+  
+  Let :
+  
+  - $\sigma$ : Standard deviation of the process.
+  - $n$ : Sample size.
+  - $\gamma$ : Desired proportion of non-conforming products.
+  - $\beta$ : probability of failing to detect the specified shift.
+  - $1-\beta$ : Desired probability of detecting the specified proportion of non-conforming products.
+  - $z_{\gamma}$ : Standard normal deviate corresponding to the specified non-conforming proportion.
+  - $z_{\beta}$ : Standard normal deviate corresponding to the Type-II error probability $\beta$.
+  
+  ##### Assumptions :
+  The same assumptions as those made for a modified control chart are considered. We assume that :
+  
+  1. The process follows a normal distribution.
+  2. The process is in statistical control with respect to its variability.
+  3. The process spread, $6\sigma$, is much smaller than the difference between the specification limits.
+  4. The individual observations are normally distributed.
+  
+  Let the process mean be $\mu$. If the process mean is such that the proportion of non-conforming products does not exceed the desired level $\gamma$, then the corresponding allowable locations of the process mean are given by
+$$
+\mu_U = USL - z_{\gamma}\sigma
+$$
+  and
+$$
+\mu_L = LSL + z_{\gamma}\sigma
+$$
+  where $\mu_U$ and $\mu_L$ represent the upper and lower allowable locations of the process mean, respectively.
+  
+  ##### Control Limits for the Sample Mean :
+  The sampling distribution of the sample mean is
+$$
+\bar{X} \sim N \left( \mu,\frac{\sigma^2}{n} \right)
+$$
+  Therefore, the standard deviation of the sample mean is
+$$
+\sigma_{\bar{X}} = \frac{\sigma}{\sqrt{n}}
+$$
+  The control limits are selected such that the probability of detecting a non-conforming proportion $\gamma$ is equal to the desired probability $1-\beta$.
+  
+  Hence, the control limits for the sample mean are
+$$
+UCL = \mu_U - z_{\beta}\frac{\sigma}{\sqrt{n}}
+$$
+  and
+$$
+LCL = \mu_L + z_{\beta}\frac{\sigma}{\sqrt{n}}
+$$
+  Substituting the expressions for $\mu_U$ and $\mu_L$, we obtain
+$$
+UCL = USL - \left(z_{\gamma} + \frac{z_{\beta}}{\sqrt{n}}\right)\sigma
+$$
+  and
+$$
+LCL = LSL + \left(z_{\gamma} + \frac{z_{\beta}}{\sqrt{n}}\right)\sigma
+$$
+  These are the modified control limits for an acceptance $\bar{X}$ control chart.
+  
+  After putting the estimated value of process standard deviation (i.e.$\hat\sigma$) :
+$$
+UCL = USL - \left(z_{\gamma} + \frac{z_{\beta}}{\sqrt{n}}\right)\frac{\bar{R}}{d_2}
+$$
+  and
+$$
+LCL = LSL + \left(z_{\gamma} + \frac{z_{\beta}}{\sqrt{n}}\right)\frac{\bar{R}}{d_2}
+$$
+  and the Center Line ( CL ) is :
+$$
+CL = \frac{UCL + LCL}{2}
+$$
+  
+  ##### Decision Rule :
+  If a sample mean falls :
+$$
+LCL \leq \bar{X} \leq UCL
+$$
+  the sample is considered acceptable according to the acceptance-control-chart criterion.
+  
+  If
+$$
+\bar{X} < LCL
+$$
+  or
+$$
+\bar{X} > UCL
+$$
+  the process is considered to have reached an unacceptable condition and should be investigated.
+
+#### **Code and Calculation :**
+
+```{r}
+# Given sample data
+sample <- 1:20
+
+xbar <- c(
+  14.8, 15.2, 16.7, 15.5, 18.4,
+  17.6, 21.4, 20.5, 22.8, 16.9,
+  25.0, 16.4, 18.6, 23.9, 17.2,
+  16.8, 21.1, 19.5, 18.3, 20.2
+)
+
+R <- c(
+  2.2, 1.6, 1.8, 2.0, 1.8,
+  1.9, 2.2, 2.3, 2.5, 1.8,
+  2.1, 1.8, 1.5, 2.3, 2.1,
+  1.6, 2.0, 2.2, 1.8, 2.3
+)
+
+data <- data.frame(
+  Sample = sample,
+  X_bar = xbar,
+  Range = R
+)
+
+data
+
+# Given
+n <- 5  # sample size
+k <- 20 # total number of samples
+
+# Specification limits
+LSL <- 12
+USL <- 33
+
+# Proportion of non-conforming products
+gamma <- 0.03
+
+# Probability of detecting an out-of-control condition
+power <- 0.95
+
+# Type-II error probability
+beta <- 1 - power
+
+# Claculating Average of X_bar & R
+x_barbar <- mean(xbar)
+R_bar <- mean(R)
+cat("The average of all sample means (i.e. X-double_bar) is :", x_barbar)
+cat("The average each sample's range (i.e. R-bar) is :", R_bar)
+
+# R-chart constants for n = 5
+d2 <- 2.326
+D3 <- 0
+D4 <- 2.114
+
+# Estimating Process Standard Deviation
+sigma_hat <- R_bar / d2
+cat("The estimated value of sigma i.e., Process Standard Deviation is :", sigma_hat)
+
+# Constructing R-Chart
+UCL_R <- D4 * R_bar
+CL_R <- R_bar
+LCL_R <- D3 * R_bar
+
+cat("The Upper Control Limit (UCL) for R is :", UCL_R)
+cat("The Center Line (CL) for R is :", CL_R)
+cat("The Lower Control Limit (LCL) for R is :", LCL_R)
+
+# Checking R-chart
+R_out <- which(R > UCL_R | R < LCL_R)
+
+if(length(R_out) == 0) {
+  print("All ranges are within the control limits.")
+} else {
+  print(paste("Out-of-control samples:",
+              paste(R_out, collapse = ", ")))
+}
+
+# Manually ploting R Control Chart
+plot(sample, R,
+     type = "o",
+     pch = 19,
+     col = "black",
+     lwd = 1,
+     xlab = "Sample Number",
+     ylab = "Range (R)",
+     main = "R Control Chart",
+     ylim = c(0, max(UCL_R, R) + 0.5))
+
+# Control Lines
+abline(h = UCL_R, col = "red", lty = 2, lwd = 2)
+abline(h = CL_R,  col = "blue", lty = 1, lwd = 2)
+abline(h = LCL_R, col = "red", lty = 2, lwd = 2)
+
+# Adding Labels
+text(10, UCL_R, paste("UCL =", round(UCL_R, 3)), col = "red", pos = 3)
+text(4, CL_R, paste("CL =", round(CL_R, 3)), col = "blue", pos = 3)
+text(15, LCL_R, paste("LCL =", round(LCL_R, 3)), col = "red", pos = 3)
+
+# Standard normal deviates
+z_gamma <- qnorm(1 - gamma)
+z_beta <- qnorm(1 - beta)
+
+cat("z_gamma =", round(z_gamma, 4))
+cat("z_beta =", round(z_beta, 4))
+
+# Constructing Acceptance X-bar chart
+
+UCL_xbar <- USL - (z_gamma + (z_beta / sqrt(n))) * sigma_hat
+LCL_xbar <- LSL + (z_gamma + (z_beta / sqrt(n))) * sigma_hat
+CL_xbar <- ((UCL_xbar + LCL_xbar) / 2)
+
+cat("The Acceptance Upper Control Limit (UCL) for X-bar is :", UCL_xbar)
+cat("The Acceptance Center Line (CL) for X-bar is :", CL_xbar)
+cat("The Acceptance Lower Control Limit (LCL) for X-bar is :", LCL_xbar)
+
+# Checking Acceptance X-bar Chart
+xbar_out <- which(
+  xbar > UCL_xbar |
+  xbar < LCL_xbar
+)
+
+if(length(xbar_out) == 0) {
+  print("All sample means are within the Acceptance control limits.")
+} else {
+  print(paste(
+    "Out-of-control samples:",
+    paste(xbar_out, collapse = ", ")
+  ))
+}
+
+# Manually Ploting Modified X-bar Chart
+plot(
+  sample, xbar,
+  type = "o",
+  pch = 19,
+  xlab = "Sample Number",
+  ylab = "Sample Mean",
+  main = "Acceptance X-bar Chart",
+  ylim = c(
+    min(LCL_xbar, xbar) - 1,
+    max(UCL_xbar, xbar) + 1
+  )
+)
+
+# Control Lines
+abline(h = UCL_xbar, col = "red", lty = 2, lwd = 2)
+abline(h = CL_xbar,  col = "blue", lty = 1, lwd = 2)
+abline(h = LCL_xbar, col = "red", lty = 2, lwd = 2)
+
+# Adding Labels
+text(10, UCL_xbar, paste("UCL =", round(UCL_xbar, 3)), col = "red", pos = 3)
+text(4, CL_xbar, paste("CL =", round(CL_xbar, 3)), col = "blue", pos = 3)
+text(15, LCL_xbar, paste("LCL =", round(LCL_xbar, 3)), col = "red", pos = 3)
+
+# Installing the required libraries
+# install.packages("qcc")
+library(qcc)
+
+# Ploting Acceptance X_bar Chart Using the package QCC
+xbar_chart <- qcc(
+  xbar,
+  type = "xbar.one",
+  center = CL_xbar,
+  limits = c(LCL_xbar, UCL_xbar),
+  title = "Acceptance X-bar Chart using in-built package QCC"
+)
+```
+
+#### **Results :**
+
+```{r results, echo = FALSE}
+results <- data.frame(
+  Parameter = c(
+    "Sample size",
+    "Number of samples",
+    "Grand mean",
+    "Average range",
+    "Estimated sigma",
+    "R-chart UCL",
+    "R-chart CL",
+    "R-chart LCL",
+    "Acceptance X_bar UCL",
+    "Acceptance X_bar CL",
+    "Acceptance X_bar LCL"
+  ),
+
+  Value = c(
+    n,
+    k,
+    x_barbar,
+    R_bar,
+    sigma_hat,
+    UCL_R,
+    CL_R,
+    LCL_R,
+    UCL_xbar,
+    CL_xbar,
+    LCL_xbar
+  )
+)
+
+results
+```
+- ##### There are 2 violating runs.
+  This indicates that some points exhibit a non-random pattern around the center line. Therefore, although no observations exceed the limits, the process may **show some evidence of non-random behavior**.
+  
+- ##### The process should therefore be interpreted with some caution.
+  It is not correct to say simply that the chart is perfectly in control because the run-rule test has detected two violations.
+
+
+#### **Conclusions :**
+The Acceptance Control Chart and R-chart were constructed for the nitrogen content of the fertilizer samples using R software. The acceptance control limits were found to be approximately :
+$$
+LCL = 14.24, \qquad CL = 22.50, \qquad UCL = 30.76
+$$
+All 20 sample means lie within these modified control limits. Therefore, **there is no out-of-control signal in the Acceptance $\bar X$-chart**.
+
+And the R-chart limits were :
+$$
+LCL = 0, \qquad CL = 1.99, \qquad UCL = 4.21
+$$
+Since all 20 sample ranges lie within these limits, the process variability is considered to be **in statistical control**.
+
+All 20 sample means fall within the acceptance control limits, and **no point exceeds the LCL or UCL**. However, **two run-rule violations** are detected, **indicating a possible non-random pattern** in the process. Thus, the process does not show any **extreme out-of-control points**, but the **run violations should be investigated** before concluding that the process is completely stable.
+
+$\text{Note :}$ A run-rule violation does **not automatically mean the process is definitely out of control**. It is a warning signal that should be investigated.

@@ -1,0 +1,298 @@
+---
+title: "Practical 1"
+author: "Deepak Kumar Bharti"
+date: '25056765013'
+output: html_document
+---
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### **Aim :**
+To construct the $\bar{X}$ (mean) control chart and $R$ (range) control chart for the given production data using R, and to determine whether the production process is statistically under control.
+
+#### **Problem :**
+A sample of size 5 is taken every hour, and 25 such samples are recorded, giving the data shown below. Construct control charts for the mean and the range on the basis of this data, and comment on whether the production process is under statistical control.
+
+| Subgroup | $X_1$ | $X_2$ | $X_3$ | $X_4$ | $X_5$ |
+|:--------:|--:|--:|--:|--:|--:|
+| 1  | 20 | 22 | 21 | 23 | 22 |
+| 2  | 19 | 18 | 22 | 20 | 20 |
+| 3  | 25 | 18 | 20 | 17 | 22 |
+| 4  | 20 | 21 | 22 | 21 | 21 |
+| 5  | 19 | 24 | 23 | 22 | 20 |
+| 6  | 22 | 20 | 18 | 18 | 19 |
+| 7  | 18 | 20 | 19 | 19 | 20 |
+| 8  | 20 | 18 | 23 | 29 | 21 |
+| 9  | 21 | 20 | 24 | 23 | 22 |
+| 10 | 21 | 19 | 20 | 20 | 20 |
+| 11 | 20 | 20 | 23 | 22 | 20 |
+| 12 | 22 | 21 | 20 | 22 | 23 |
+| 13 | 19 | 22 | 19 | 18 | 19 |
+| 14 | 20 | 21 | 22 | 21 | 22 |
+| 15 | 20 | 24 | 24 | 23 | 23 |
+| 16 | 21 | 20 | 24 | 20 | 21 |
+| 17 | 20 | 18 | 18 | 20 | 20 |
+| 18 | 20 | 24 | 22 | 23 | 23 |
+| 19 | 20 | 19 | 23 | 20 | 19 |
+| 20 | 22 | 21 | 21 | 24 | 22 |
+| 21 | 23 | 22 | 22 | 20 | 22 |
+| 22 | 21 | 19 | 18 | 17 | 19 |
+| 23 | 21 | 24 | 24 | 23 | 23 |
+| 24 | 20 | 22 | 21 | 21 | 20 |
+| 25 | 19 | 20 | 21 | 21 | 22 |
+
+#### **Theory :**
+
+##### **<u>Statistical Process Control (SPC)</u>**
+**Statistical Process Control (SPC)** is a statistical technique used to monitor and control a production process. Control charts help determine whether the variation in a process is due to **random (common) causes** or **assignable (special) causes**.
+
+When samples of equal size are taken from a production process at regular intervals, an **X-bar chart** and an **R-chart** can be used together.
+
+- ##### **X-bar Chart**
+  The **$\bar{X}$ chart** is used to monitor the **average or central tendency** of the production process.
+    
+  For each subgroup of size $n$, the **subgroup mean** is calculated as:
+$$
+\bar{X}_i = \frac{1}{n}\sum_{j=1}^{n} X_{ij}
+$$
+  The **average** of **all subgroup means** is:
+$$
+\bar{\bar{X}} = \frac{1}{k}\sum_{i=1}^{k} \bar{X}_i
+$$
+  where $k$ is the **number of subgroups**.
+
+  The control limits for the X-bar chart are :
+$$
+UCL_{\bar{X}} = \bar{\bar{X}} + A_2\bar{R}
+$$
+$$
+CL_{\bar{X}} = \bar{\bar{X}}
+$$
+$$
+LCL_{\bar{X}} = \bar{\bar{X}} - A_2\bar{R}
+$$
+  where $\bar{R}$ is the **average subgroup range** and $A_2$ is a **control-chart constant**.
+
+  For a sample size of $n=5$ :
+$$
+A_2 = 0.577
+$$
+
+- ##### **R-Chart**
+
+  The **R-chart** is used to monitor the **variability or dispersion** of the production process.
+
+  For each subgroup, the **range** is calculated as:
+$$
+R_i = X_{max} - X_{min}
+$$
+  The **average range** is:
+$$
+\bar{R} = \frac{1}{k}\sum_{i=1}^{k} R_i
+$$
+  The control limits for the R-chart are:
+$$
+UCL_R = D_4\bar{R}
+$$
+$$
+CL_R = \bar{R}
+$$
+$$
+LCL_R = D_3\bar{R}
+$$
+  For a sample size of $n=5$ :
+$$
+D_3 = 0,\qquad D_4 = 2.114
+$$
+
+- ##### **Decision rule for Control Charts**
+
+  A production process is considered **statistically under control** when all plotted points lie within the respective control limits and there are no unusual patterns, trends, or systematic variations.
+
+  - The **X-bar chart** checks whether the process mean is stable.
+  - The **R-chart** checks whether the process variability is stable.
+  - Both charts should be considered together to determine the overall state of the production process.
+
+#### **Code and Calculation :**
+
+```{r}
+# Given Data
+x <- matrix(c(
+  20,22,21,23,22,
+  19,18,22,20,20,
+  25,18,20,17,22,
+  20,21,22,21,21,
+  19,24,23,22,20,
+  22,20,18,18,19,
+  18,20,19,19,20,
+  20,18,23,29,21,
+  21,20,24,23,22,
+  21,19,20,20,20,
+  20,20,23,22,20,
+  22,21,20,22,23,
+  19,22,19,18,19,
+  20,21,22,21,22,
+  20,24,24,23,23,
+  21,20,24,20,21,
+  20,18,18,20,20,
+  20,24,22,23,23,
+  20,19,23,20,19,
+  22,21,21,24,22,
+  23,22,22,20,22,
+  21,19,18,17,19,
+  21,24,24,23,23,
+  20,22,21,21,20,
+  19,20,21,21,22
+), ncol = 5, byrow = TRUE)
+
+colnames(x) <- c("X1", "X2", "X3", "X4", "X5")
+
+x
+
+# Calculating subgroup mean and range
+xbar <- rowMeans(x)
+R <- apply(x, 1, function(z) max(z) - min(z))
+
+result <- data.frame(
+  Subgroup = 1:25,
+  X_bar = xbar,
+  R = R
+)
+
+result
+
+# Calculating X-double_bar and R-bar
+xbarbar <- mean(xbar)
+Rbar <- mean(R)
+
+cat("The average of all subgroup means (i.e. X-double_bar) is :", xbarbar)
+cat("The average each subgroup's range (i.e. R-bar) is :", Rbar)
+
+# Constructing the X-bar control chart
+A2 <- 0.577 # X_bar chart constant for n = 5
+
+UCL_xbar <- xbarbar + A2 * Rbar
+CL_xbar <- xbarbar
+LCL_xbar <- xbarbar - A2 * Rbar
+
+cat("The Upper Control Limit (UCL) for X-bar is :", UCL_xbar)
+cat("The Center Line (CL) for X-bar is :", CL_xbar)
+cat("The Lower Control Limit (LCL) for X-bar is :", LCL_xbar)
+
+# Checking X-bar Chart
+xbar_out <- which(
+  xbar > UCL_xbar |
+  xbar < LCL_xbar
+)
+
+if(length(xbar_out) == 0) {
+  print("All sample means are within the control limits.")
+} else {
+  print(paste(
+    "Out-of-control samples:",
+    paste(xbar_out, collapse = ", ")
+  ))
+}
+
+# Constructing the R control chart
+# R chart constant for n = 5
+D3 <- 0
+D4 <- 2.114
+
+UCL_R <- D4 * Rbar
+CL_R <- Rbar
+LCL_R <- D3 * Rbar
+
+cat("The Upper Control Limit (UCL) for R is :", UCL_R)
+cat("The Center Line (CL) for R is :", CL_R)
+cat("The Lower Control Limit (LCL) for R is :", LCL_R)
+
+# Checking R-chart
+R_out <- which(R > UCL_R | R < LCL_R)
+
+if(length(R_out) == 0) {
+  print("All ranges are within the control limits.")
+} else {
+  print(paste("Out-of-control samples:",
+              paste(R_out, collapse = ", ")))
+}
+
+# Manually ploting X-bar Control Chart
+plot(xbar,
+     type = "o",
+     pch = 16,
+     col = "black",
+     lwd = 1,
+     xlab = "Subgroup",
+     ylab = "Subgroup Mean",
+     main = "X-bar Control Chart",
+     ylim = c(18.5, 23.5))
+
+# Control Lines
+abline(h = UCL_xbar, col = "red", lty = 2, lwd = 2)
+abline(h = CL_xbar,  col = "blue", lty = 1, lwd = 2)
+abline(h = LCL_xbar, col = "red", lty = 2, lwd = 2)
+
+# Adding Labels
+text(10, UCL_xbar, paste("UCL =", round(UCL_xbar, 3)), col = "red", pos = 3)
+text(4, CL_xbar, paste("CL =", round(CL_xbar, 3)), col = "blue", pos = 3)
+text(15, LCL_xbar, paste("LCL =", round(LCL_xbar, 3)), col = "red", pos = 3)
+
+# Manually ploting R Control Chart
+plot(R,
+     type = "o",
+     pch = 16,
+     col = "black",
+     lwd = 1,
+     xlab = "Subgroup",
+     ylab = "Range",
+     main = "R Control Chart",
+     ylim = c(0, 11.5))
+
+# Control Lines
+abline(h = UCL_R, col = "red", lty = 2, lwd = 2)
+abline(h = CL_R,  col = "blue", lty = 1, lwd = 2)
+abline(h = LCL_R, col = "red", lty = 2, lwd = 2)
+
+# Adding Labels
+text(10, UCL_R, paste("UCL =", round(UCL_R, 3)), col = "red", pos = 3)
+text(4, CL_R, paste("CL =", round(CL_R, 3)), col = "blue", pos = 3)
+text(15, LCL_R, paste("LCL =", round(LCL_R, 3)), col = "red", pos = 3)
+```
+
+```{r}
+# Using the package QCC
+
+# Installing the required libraries
+# install.packages("qcc")
+library(qcc)
+
+# Ploting X-bar Control Chart
+xbar_chart <- qcc(x,
+                  type = "xbar",
+                  plot = TRUE)
+
+
+# Ploting R Control Chart
+r_chart <- qcc(x,
+               type = "R",
+               plot = TRUE)
+```
+
+#### **Results :**
+The Control Limits are :
+
+| Chart | LCL | CL | UCL |
+|:-----------:|:-----------:|:-----------:|:-----------:|
+| $\bar{X}$ (Mean) Chart | 18.7816 | 20.9280 | 23.0744 |
+| $R$ (Range) Chart | 0 | 3.7200 | 7.8641 |
+
+- The **X-bar chart** shows that the process mean is **under statistical control**, since all subgroup means **lie within the control limits**.
+- However, the **R chart** shows that the process is **not under statistical control** because **two subgroup 3 & 8** has a **range of 8 & 11** respectively, which **exceed** the **upper control limit of 7.864**.
+- The **qcc package plots** reproduce the same central lines and control limits, **confirming the manual calculations** above. 
+
+#### **Conclusions :**
+The **X-bar chart** indicates that the **process mean** is **under control**. However, the **R-chart** indicates that the **process variability** is **not under control** because subgroup 3 & 8 exceeds the upper control limit. Therefore, the **overall production process** is considered **not under statistical control** and may have an assignable cause of variation that should be investigated.

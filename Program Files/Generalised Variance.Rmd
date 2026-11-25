@@ -1,0 +1,428 @@
+---
+title: "Practical 7"
+author: "Yash Jaiswal"
+date: "2026-11-25"
+output: html_document
+---
+
+# AIM
+
+To construct the generalised variance (|S|) control chart and its contour plot for two quality characteristics using R.
+
+# PROBLEM
+
+Twenty subgroups, each containing four observations, are taken on two quality characteristics: single strand break strength (X1) and weight of textile fibre (X2). Using the given data, construct the generalised variance chart and the corresponding contour plot.
+
+Given:
+
+- m = 20 (Number of subgroups)
+- n = 4 (Number of observations per subgroup)
+- p = 2 (Number of quality characteristics)
+
+# THEORY
+
+## Generalised Variance Control Chart
+
+The Hotelling's T² control chart monitors the process mean vector, whereas the generalised variance control chart monitors the variability of the process based on the variance-covariance matrix.
+
+A measure of generalised variance is the determinant of the sample variance-covariance matrix, denoted by:
+
+\[
+|S_j|=\det(S_j)
+\]
+
+where \(S_j\) is the sample variance-covariance matrix of the jth subgroup.
+
+For a multivariate normal population with variance-covariance matrix \(\Sigma\), the mean and variance of the determinant of the sample covariance matrix are:
+
+\[
+E(|S|)=b_1|\Sigma|
+\]
+
+\[
+Var(|S|)=b_2|\Sigma|^2
+\]
+
+where
+
+\[
+b_1=\frac{\prod_{i=1}^{p}(n-i)}{(n-1)^p}
+\]
+
+and
+
+\[
+b_2=
+\frac{
+\prod_{i=1}^{p}(n-i)
+\left[
+\prod_{i=1}^{p}(n-i+2)
+-
+\prod_{i=1}^{p}(n-i)
+\right]
+}{(n-1)^{2p}}
+\]
+
+Here, \(\Sigma\) represents the population variance-covariance matrix.
+
+## Estimation of Generalised Variance
+
+Since the population covariance matrix \(\Sigma\) is unknown, its determinant is estimated using the average of the subgroup covariance matrices:
+
+\[
+\bar S=\frac{1}{m}\sum_{j=1}^{m}S_j
+\]
+
+An unbiased estimate of the population generalised variance is:
+
+\[
+\widehat{|\Sigma|}=\frac{|\bar S|}{b_1}
+\]
+
+The centre line is:
+
+\[
+CL=b_1\widehat{|\Sigma|}
+\]
+
+The upper and lower control limits are:
+
+\[
+UCL=\widehat{|\Sigma|}(b_1+3\sqrt{b_2})
+\]
+
+\[
+LCL=\widehat{|\Sigma|}(b_1-3\sqrt{b_2})
+\]
+
+If the lower control limit is negative, it is taken as zero:
+
+\[
+LCL=\max[0,\widehat{|\Sigma|}(b_1-3\sqrt{b_2})]
+\]
+
+For the jth subgroup, \(|S_j|\) is computed and plotted on the chart. A point outside the limits indicates that the process variability may be out of control.
+
+## Contour Plot for Generalised Variance
+
+For two quality characteristics, the determinant of the sample covariance matrix is:
+
+\[
+|S|=s_{11}s_{22}(1-r^2)
+\]
+
+where:
+
+- \(s_{11}\) is the sample variance of X1.
+- \(s_{22}\) is the sample variance of X2.
+- \(r\) is the correlation coefficient between the two quality characteristics.
+
+Taking the average correlation coefficient as fixed, the equation for a constant generalised variance becomes:
+
+\[
+s_{11}s_{22}(1-r^2)=C
+\]
+
+where C represents a constant value of generalised variance.
+
+By setting \(C=CL\) and \(C=UCL\), the corresponding contour curves are obtained.
+
+Each subgroup is plotted as the point:
+
+\[
+(s_{11,j},s_{22,j})
+\]
+
+Points lying beyond the UCL contour indicate excessive process variability.
+
+# CODE AND OUTPUT
+
+## 1. Entering the Data
+
+```{r data-entry}
+m=20
+n=4
+p=2
+
+# Data for X1
+x1=matrix(c(
+80,82,78,85,
+75,79,84,81,
+83,86,84,87,
+79,84,80,83,
+82,81,78,86,
+86,84,85,97,
+94,88,92,85,
+76,84,78,82,
+95,88,85,87,
+80,78,81,83,
+88,94,85,86,
+91,91,85,82,
+80,86,82,79,
+75,78,82,80,
+77,90,79,85,
+86,82,94,84,
+84,85,78,74,
+82,86,79,83,
+79,88,95,83,
+90,84,82,85
+),nrow=m,byrow=TRUE)
+
+# Data for X2
+x2=matrix(c(
+19,22,20,20,
+24,21,18,21,
+17,24,21,21,
+18,20,17,16,
+23,21,18,22,
+21,20,22,21,
+19,23,19,22,
+22,17,19,18,
+18,16,20,16,
+19,19,20,18,
+23,20,24,22,
+22,21,23,21,
+16,19,20,19,
+22,21,22,22,
+22,19,21,18,
+19,23,16,22,
+17,22,18,19,
+20,19,23,21,
+21,23,20,18,
+18,22,19,20
+),nrow=m,byrow=TRUE)
+
+# Display the data
+x1
+x2
+```
+
+## 2. Calculating Subgroup Generalised Variances
+
+The sample covariance matrix for each subgroup is calculated using the `cov()` function. Its determinant is obtained using `det()`.
+
+```{r subgroup-variance}
+# Generalised variance of each subgroup
+detS=numeric(m)
+
+# Initialise average covariance matrix
+S=matrix(0,p,p)
+
+for (j in 1:m) {
+  Sj=cov(cbind(x1[j,],x2[j,]))
+  detS[j]=det(Sj)
+  S=S+Sj
+}
+
+# Average covariance matrix
+S=S/m
+
+# Display subgroup generalised variances
+detS
+
+# Display average covariance matrix
+S
+```
+
+## 3. Calculating Control Limits
+
+The constants b1 and b2 are calculated using the given formulas.
+
+```{r control-limits}
+# Constants b1 and b2
+b1=prod(n-1:p)/(n-1)^p
+
+b2=prod(n-1:p)*(prod(n-1:p+2)-prod(n-1:p))/(n-1)^(2*p)
+
+# Estimate of population generalised variance
+detSigma=det(S)/b1
+
+# Centre line
+CL=b1*detSigma
+
+# Upper control limit
+UCL=detSigma*(b1+3*sqrt(b2))
+
+# Lower control limit
+LCL=max(0,detSigma*(b1-3*sqrt(b2)))
+
+# Display calculated values
+c(b1=b1,b2=b2,detSigma=detSigma,CL=CL,UCL=UCL,LCL=LCL)
+```
+
+## 4. Generalised Variance Control Chart
+
+```{r variance-chart}
+# Generalised variance control chart
+plot(1:m,detS,
+     type="b",
+     pch=19,
+     xlab="Subgroup",
+     ylab="|S|",
+     main="Generalised Variance Control Chart",
+     ylim=c(0,max(detS,UCL)+10))
+
+# Adding control limits
+abline(h=c(CL,UCL,LCL),
+       lty=c(1,2,3),
+       lwd=2)
+
+# Adding labels
+text(m,UCL,"UCL",pos=3)
+text(m,CL,"CL",pos=3)
+text(m,LCL,"LCL",pos=3)
+```
+
+## 5. Contour Plot for Generalised Variance
+
+```{r contour-plot}
+# Variance of X1 for each subgroup
+s11=apply(x1,1,var)
+
+# Variance of X2 for each subgroup
+s22=apply(x2,1,var)
+
+# Average correlation coefficient
+r=S[1,2]/sqrt(S[1,1]*S[2,2])
+
+# Generate grid values
+g1=seq(0,max(s11)*1.2,length=200)
+g2=seq(0,max(s22)*1.2,length=200)
+
+# Calculate generalised variance over the grid
+Z=outer(g1,g2,function(a,b) a*b*(1-r^2))
+
+# Contour plot for centre line
+contour(g1,g2,Z,
+        levels=CL,
+        labels=paste("CL =",round(CL,2)),
+        labcex=0.9,
+        lwd=2,
+        xlab="Variance of X1 (s11)",
+        ylab="Variance of X2 (s22)",
+        main="Generalised Variance Contour Plot")
+
+# Add UCL contour
+contour(g1,g2,Z,
+        levels=UCL,
+        labels=paste("UCL =",round(UCL,2)),
+        labcex=0.9,
+        lwd=2,
+        lty=2,
+        add=TRUE)
+
+# Plot subgroup points
+points(s11,s22,pch=19)
+
+# Add subgroup numbers
+text(s11,s22,
+     labels=1:m,
+     pos=3,
+     cex=0.7)
+```
+
+# RESULTS AND INTERPRETATION
+
+## 1. Average Covariance Matrix
+
+The average covariance matrix of the 20 subgroups obtained from the R output is:
+
+\[
+\bar S=
+\begin{pmatrix}
+S_{11} & S_{12}\\
+S_{12} & S_{22}
+\end{pmatrix}
+\]
+
+The determinant of the average covariance matrix is:
+
+\[
+|\bar S|=24.6032
+\]
+
+## 2. Calculated Constants and Control Limits
+
+The calculated values are:
+
+\[
+b_1=0.6667
+\]
+
+\[
+b_2=1.0370
+\]
+
+The estimated population generalised variance is:
+
+\[
+\widehat{|\Sigma|}=36.9048
+\]
+
+The centre line is:
+
+\[
+CL=24.6032
+\]
+
+The upper control limit is:
+
+\[
+UCL=137.3493
+\]
+
+The lower control limit is:
+
+\[
+LCL=0
+\]
+
+The lower control limit obtained from the formula is negative; therefore, it is taken as zero.
+
+## 3. Interpretation of the Control Chart
+
+All 20 subgroup generalised variance values lie between the lower and upper control limits.
+
+The largest value is:
+
+\[
+|S_{19}|=51.7222
+\]
+
+which is well below the upper control limit of 137.3493.
+
+The smallest value is:
+
+\[
+|S_{12}|=0.50
+\]
+
+Subgroups 17 and 19 have relatively high generalised variance values, but both remain within the control limits.
+
+Therefore, there is no evidence of an out-of-control subgroup based on the generalised variance chart.
+
+## 4. Interpretation of the Contour Plot
+
+The contour plot represents the relationship between the variances of the two quality characteristics, X1 and X2.
+
+The centre line and upper control limit are represented by their respective contour curves.
+
+All 20 subgroup points lie within the UCL contour, which agrees with the conclusion obtained from the generalised variance control chart.
+
+Thus, the contour plot also indicates that the process variability is within the control limits.
+
+# CONCLUSION
+
+The generalised variance control chart and its corresponding contour plot were successfully constructed using R for two quality characteristics: single strand break strength and weight of textile fibre.
+
+The calculated control limits are:
+
+\[
+\boxed{LCL=0,\quad CL=24.6032,\quad UCL=137.3493}
+\]
+
+All 20 subgroup generalised variance values lie within the control limits. The contour plot also confirms that all subgroup points lie within the UCL contour.
+
+Hence, the process variability is in statistical control, and no subgroup needs to be removed based on the generalised variance chart.
+
+The estimated average covariance matrix can subsequently be used in constructing the Hotelling's T² control chart for monitoring the process mean vector.
